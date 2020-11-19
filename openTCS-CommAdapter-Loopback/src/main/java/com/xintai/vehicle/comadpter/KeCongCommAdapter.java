@@ -104,9 +104,9 @@ private   boolean connected=false;
 private  boolean  isconnected=false;
  private void processObjectEvent(TCSObjectEvent event) {
     TCSObject<?> object = event.getCurrentOrPreviousObjectState();
-    /*   if (object instanceof TransportOrder) {
+     if (object instanceof TransportOrder) {
     processOrderEvent(event);
-    }*/
+    }
      if (object instanceof Vehicle) {
       processVehicleEvent(event);
     }
