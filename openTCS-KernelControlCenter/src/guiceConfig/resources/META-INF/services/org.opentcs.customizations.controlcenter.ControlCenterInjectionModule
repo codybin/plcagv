@@ -1,0 +1,5 @@
+org.opentcs.kernelcontrolcenter.DefaultKernelControlCenterExtensionsModule
+org.opentcs.kernelcontrolcenter.LoopbackCommAdapterPanelsModule
+org.opentcs.kernelcontrolcenter.ExampleControlCenterInjectionModule
+org.opentcs.kernelcontrolcenter.KeCongControlCenterInjectionModule
+org.opentcs.kernelcontrolcenter.PLCControlCenterInjectionModule

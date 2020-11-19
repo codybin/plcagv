@@ -1,0 +1,4 @@
+org.opentcs.virtualvehicle.LoopbackCommAdapterModule
+org.opentcs.virtualvehicle.ExampleKernelInjectionModule
+org.opentcs.virtualvehicle.KeCongKernelInjectionModule
+org.opentcs.virtualvehicle.PLCKernelInjectionModule
