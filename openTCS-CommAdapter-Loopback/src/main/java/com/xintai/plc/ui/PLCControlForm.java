@@ -61,6 +61,7 @@ private static final Logger LOG = LoggerFactory.getLogger(PLCControlForm.class);
     updatePLCVehicleModelData(attributeChanged, processModel);
     updateVehicleProcessModelData(attributeChanged, processModel);
   }
+  //更新plc驱动的叉车模型数据
     private void updatePLCVehicleModelData(String attributeChanged,
                                               PLCProcessModelTO processModel) {
 
