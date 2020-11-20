@@ -23,19 +23,24 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The default {@link CallWrapper} implementation used for calling kernel service methods.
+ * 默认的实现，该实现是用来调用内核服务方法的。
  * <p>
+ * 如果一个服务方法用这个实现被调用，相应的服务不再可利用，实现将要要求重新调用服务方法
  * If a service method is called using this implementation and the corresponding service is no
  * longer available, this implementation will ask to retry the service method call:
  * <ul>
  * <li>
+ * 如果重新尝试置位是，实现将要处理内核连接的重新连接，一旦重新连接则尝试再次调用服务方法
  * If 'Retry - Yes' is selected, this implementation will handle reestablishment of the kernel
  * connection and (upon successful reestablishment) try to call the service method again.
  * </li>
  * <li>
+ * 如果重新尝试置位false.则实现将要抛出异常
  * If 'Retry - No' is selected, this implementation will throw the exception thrown by the service
  * mehtod call itself.
  * </li>
  * <li>
+ * 如果取消被选择，这个实现将要自己抛出异常，自动通知应用它不在线上，例如不再连接到内核上
  * If 'Cancel' is selected, this implementation will throw the exception thrown by the service
  * mehtod call itself and additionally will notify the application it's no longer online, i.e.
  * connected to the kernel.
@@ -58,10 +63,12 @@ public class DefaultServiceCallWrapper
   private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BUNDLE_PATH);
   /**
    * The application using this utility.
+   * 应用这个实体的应用
    */
   private final KernelClientApplication application;
   /**
    * The portal manager taking care of the portal connection.
+   * 管理端口连接的端口管理者
    */
   private final PortalManager portalManager;
 

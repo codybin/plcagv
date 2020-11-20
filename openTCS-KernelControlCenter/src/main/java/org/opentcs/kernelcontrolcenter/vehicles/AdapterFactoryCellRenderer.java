@@ -16,7 +16,7 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterDescription;
 
 /**
  * ListCellRenderer for the adapter combo box.
- *
+ *为了适配器listcell的绘制
  * @author Philipp Seifert (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
  */

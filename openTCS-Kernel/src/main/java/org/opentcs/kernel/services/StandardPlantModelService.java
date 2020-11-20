@@ -172,14 +172,14 @@ public class StandardPlantModelService
         new UserNotification("Kernel created model " + to.getName(),
                              UserNotification.Level.INFORMATIONAL));
   }
-
+//获取模型的名字
   @Override
   public String getModelName() {
     synchronized (globalSyncObject) {
       return model.getName();
     }
   }
-
+//获取模型的属性
   @Override
   public Map<String, String> getModelProperties()
       throws KernelRuntimeException {

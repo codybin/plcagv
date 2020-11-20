@@ -61,7 +61,7 @@ public class StandardDispatcherService
       dispatcher.dispatch();
     }
   }
-
+//根绝车取消订单
   @Override
   public void withdrawByVehicle(TCSObjectReference<Vehicle> ref, boolean immediateAbort)
       throws ObjectUnknownException {
@@ -69,7 +69,7 @@ public class StandardDispatcherService
       dispatcher.withdrawOrder(globalObjectPool.getObject(Vehicle.class, ref), immediateAbort);
     }
   }
-
+//根据订单取消订单
   @Override
   public void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref,
                                        boolean immediateAbort)

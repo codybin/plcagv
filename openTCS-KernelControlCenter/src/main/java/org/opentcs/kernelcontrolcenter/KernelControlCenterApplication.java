@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * The kernel control center application's entry point.
- *
+ *控制中心应用的进入点
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class KernelControlCenterApplication
@@ -33,30 +33,37 @@ public class KernelControlCenterApplication
   private static final Logger LOG = LoggerFactory.getLogger(KernelControlCenterApplication.class);
   /**
    * The instance fetching for kernel events.
+   * 获取内核事件的实例
    */
   private final KernelEventFetcher eventFetcher;
   /**
    * The actual kernel control center.
+   * 真实的控制中心街
    */
   private final KernelControlCenter kernelControlCenter;
   /**
    * The service portal manager.
+   * 服务端口管理
    */
   private final PortalManager portalManager;
   /**
    * The application's event bus.
+   * 应用的事件通道
    */
   private final EventBus eventBus;
   /**
    * The application's configuration.
+   * 应用的配置
    */
   private final KernelControlCenterConfiguration configuration;
   /**
    * Whether this application is online or not.
+   * 是否这个应用在线
    */
   private ConnectionState connectionState = ConnectionState.OFFLINE;
   /**
    * Whether this application is initialized or not.
+   * 是否这个应用被初始化
    */
   private boolean initialized;
 
@@ -124,8 +131,9 @@ public class KernelControlCenterApplication
     }
 
     connectionState = ConnectionState.CONNECTING;
+    //连接内核
     if (portalManager.connect(toConnectionMode(autoConnect))) {
-      LOG.info("Switching application state to online...");
+      LOG.info("应用和内核连接...");
       connectionState = ConnectionState.ONLINE;
       eventBus.onEvent(ClientConnectionMode.ONLINE);
     }
@@ -142,7 +150,7 @@ public class KernelControlCenterApplication
 
     portalManager.disconnect();
 
-    LOG.info("Switching application state to offline...");
+    LOG.info("应用和内核断开连接...");
     connectionState = ConnectionState.OFFLINE;
     eventBus.onEvent(ClientConnectionMode.OFFLINE);
   }

@@ -71,15 +71,18 @@ public class DetailPanel
       .withZone(ZoneId.systemDefault());
   /**
    * The adapter specific list of JPanels.
+   * 适配器特定的界面列表
    */
   private final List<VehicleCommAdapterPanel> customPanelList = new LinkedList<>();
   /**
    * The set of factories to create adapter specific panels.
+   * 创建适配器界面的工厂。
    */
   private final Set<VehicleCommAdapterPanelFactory> panelFactories;
   
   /**
    * The logging table model to use.
+   * 
    */
   private final LogTableModel loggingTableModel = new LogTableModel();
   /**
@@ -96,14 +99,17 @@ public class DetailPanel
   private final CallWrapper callWrapper;
   /**
    * The vehicle model of the vehicle current associated with this window.
+   * 同当前这个窗口关联的车辆模型
    */
   private LocalVehicleEntry vehicleEntry;
   /**
    * The comm adapter currently attached to the vehicle (model).
+   * 当前关联到这个车辆的模型的适配器
    */
   private AttachmentInformation attachmentInfo;
   /**
    * Whether this panel is initialized or not.
+   * 是否这个面板被初始化
    */
   private boolean initialized;
 
@@ -201,7 +207,7 @@ public class DetailPanel
 
   /**
    * Attaches this panel to a vehicle.
-   *
+   *将界面和车辆管理起来
    * @param newVehicleEntry The vehicle entry to attach to.
    */
   void attachToVehicle(LocalVehicleEntry newVehicleEntry) {
@@ -623,7 +629,7 @@ public class DetailPanel
   private void clearMenuItemActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearMenuItemActionPerformed
     loggingTextArea.setText("");
   }//GEN-LAST:event_clearMenuItemActionPerformed
-
+//使能适配器
   private void chkBoxEnableActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chkBoxEnableActionPerformed
     try {
       if (chkBoxEnable.isSelected()) {
