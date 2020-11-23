@@ -24,7 +24,9 @@ import org.opentcs.data.order.TransportOrder;
 /**
  * This interface declares the methods a router module for the openTCS
  * kernel must implement.
+ * 这个接口声明了路线规划模块必须实现的方法
  * <p>
+ * 一个路线规划者找到从起点到终点的路径点，并依据它们的花费排列它们 
  * A router finds routes from a start point to an end point, rating them
  * according to implementation specific criteria/costs parameters.
  * </p>
@@ -36,6 +38,7 @@ public interface Router
 
   /**
    * The key of a vehicle property defining the group of vehicles that may share the same routing.
+   * 定义车辆组可以分享相同路线的键
    * <p>
    * The value is expected to be an integer.
    * </p>
@@ -44,6 +47,7 @@ public interface Router
   /**
    * The key (prefix) of a path property defining the routing cost when its travelled in forward
    * direction.
+   * 定义前进方向的路径花费的键
    * <p>
    * The value is expected to be a (long) integer.
    * </p>
@@ -60,20 +64,24 @@ public interface Router
 
   /**
    * Notifies the router of changes in the topology.
+   * 通知路径规划者拓扑信息改变
    */
   void topologyChanged();
 
   /**
    * Checks the general routability of a given transport order.
-   *
+   *核查一个给定订单的可能性
    * @param order The transport order to check for routability.
    * @return A set of vehicles for which a route for the given transport order
    * would be computable.
+   * 对于给定订单的路线可计算的一些列车辆？
    */
   @Nonnull
   Set<Vehicle> checkRoutability(@Nonnull TransportOrder order);
 
   /**
+   * 对于在一个特定点的给定的车辆， 允许车辆处理订单的，返回的一个完整的路线。
+   * 
    * Returns a complete route for a given vehicle that starts on a specified
    * point and allows the vehicle to process a given transport order.
    * The route is encapsulated into drive orders which correspond to those drive
@@ -110,7 +118,7 @@ public interface Router
   /**
    * Returns the costs for travelling a route from one point to another with a
    * given vehicle.
-   *
+   *返回一个车辆从一个点到另一个点的损失
    * @param vehicle The vehicle for which the route must be passable.
    * @param sourcePoint The starting point of the route.
    * @param destinationPoint The end point of the route.
@@ -137,7 +145,7 @@ public interface Router
 
   /**
    * Notifies the router of a route being selected for a vehicle.
-   *
+   *通知路线规划者一个车辆正在被选择。
    * @param vehicle The vehicle for which a route is being selected.
    * @param driveOrders The drive orders encapsulating the route being selected,
    * or <code>null</code>, if no route is being selected for the vehicle (i.e.
@@ -157,7 +165,7 @@ public interface Router
 
   /**
    * Returns all points which are currently targeted by any vehicle.
-   *
+   *返回所有车辆的目标点
    * @return A set of all points currently targeted by any vehicle.
    */
   @Nonnull

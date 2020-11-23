@@ -26,16 +26,18 @@ public class StandardNotificationService
 
   /**
    * A global object to be used for synchronization within the kernel.
+   * 在内核中用来同步的内核变量
    */
   private final Object globalSyncObject;
   /**
    * The buffer for all messages published.
+   * 发布所有信息的缓存
    */
   private final NotificationBuffer notificationBuffer;
 
   /**
    * Creates a new instance.
-   *
+   *创建一个新的实例
    * @param globalSyncObject The kernel threads' global synchronization object.
    * @param notificationBuffer The notification buffer to be used.
    */

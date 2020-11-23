@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Implements a basic simple scheduler strategy for resources used by vehicles, preventing
  * collisions.
- *
+ *补充一个基本的调度策略
  * @author Iryna Felko (Fraunhofer IML)
  * @author Stefan Walter (Fraunhofer IML)
  */

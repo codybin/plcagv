@@ -48,7 +48,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * A GUI frontend for basic control over the kernel.
- *
+ *前段的gui，包含基本的的对内核的基本控制
  * @author Stefan Walter (Fraunhofer IML)
  * @author Martin Grzenia (Fraunhofer IML)
  */
@@ -71,10 +71,12 @@ public class KernelControlCenter
   private final ControlCenterInfoHandlerFactory controlCenterInfoHandlerFactoy;
   /**
    * Providers for panels shown in modelling mode.
+   * 在模型模式展示界面的容器
    */
   private final Collection<Provider<ControlCenterPanel>> panelProvidersModelling;
   /**
    * Providers for panels shown in operating mode.
+   * 在运行模式展示界面的容器
    */
   private final Collection<Provider<ControlCenterPanel>> panelProvidersOperating;
   /**
@@ -83,38 +85,47 @@ public class KernelControlCenter
   private final AboutDialog aboutDialog;
   /**
    * Panels currently active/shown.
+   * 当前展示的活跃的界面
    */
   private final Set<ControlCenterPanel> activePanels = Collections.synchronizedSet(new HashSet<>());
   /**
+   * 在这个内核上面运行的应用
    * The application running this panel.
    */
   private final KernelClientApplication application;
   /**
    * Where this instance registers for application events.
+   * 我们注册应用的地方
    */
   private final EventSource eventSource;
   /**
    * The service portal to use for kernel interaction.
+   * 和内核交互 的服务端口
    */
   private final KernelServicePortal servicePortal;
   /**
    * The portal manager.
+   * 端口管理者
    */
   private final PortalManager portalManager;
   /**
    * The call wrapper to use for service calls.
+   * 服务的调用包裹
    */
   private final CallWrapper callWrapper;
   /**
    * Indicates whether this component is initialized.
+   * 指示这个组件是否被初始化
    */
   private boolean initialized;
   /**
    * The ControlCenterInfoHandler.
+   * 控制中心信息句柄
    */
   private ControlCenterInfoHandler infoHandler;
   /**
    * The current Model Name.
+   * 当前的模型名字
    */
   private String currentModel = "";
 
@@ -213,7 +224,7 @@ public class KernelControlCenter
       LOG.warn("Error getting the kernel state", ex);
     }
   }
-
+//内核断开连接
   private void onKernelDisconnect() {
     leavingKernelState(Kernel.State.OPERATING);
     enteringKernelState(Kernel.State.MODELLING);
@@ -266,7 +277,7 @@ public class KernelControlCenter
 
   /**
    * Perfoms some tasks when a state is being leaved.
-   *
+   *当一个状态正在离开时，执行的任务
    * @param oldState The state we're leaving
    */
   private void leavingKernelState(Kernel.State oldState) {
@@ -278,7 +289,7 @@ public class KernelControlCenter
 
   /**
    * Notifies this control center that the kernel has entered a different state.
-   *
+   *通知控制中心内核已经进入了一个不同的状态
    * @param newState
    */
   private void enteringKernelState(Kernel.State newState) {
@@ -297,7 +308,7 @@ public class KernelControlCenter
     // Updating the window title
     updateWindowTitle();
   }
-
+//添加界面
   private void addPanels(Collection<Provider<ControlCenterPanel>> providers) {
     for (Provider<ControlCenterPanel> provider : providers) {
       SwingUtilities.invokeLater(() -> addPanel(provider.get()));

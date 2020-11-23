@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Philipp Seifert (Fraunhofer IML)
  */
+//控制中心信息处理
 public class ControlCenterInfoHandler
     implements EventHandler {
 
@@ -41,10 +42,12 @@ public class ControlCenterInfoHandler
   private static final Logger LOG = LoggerFactory.getLogger(ControlCenterInfoHandler.class);
   /**
    * This class's configuration.
+   * 该类的配置信息
    */
   private final KernelControlCenterConfiguration configuration;
   /**
    * Formats time stamps.
+   * 事件戳
    */
   private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter
       .ofLocalizedDateTime(FormatStyle.SHORT)
@@ -52,10 +55,12 @@ public class ControlCenterInfoHandler
       .withZone(ZoneId.systemDefault());
   /**
    * The text area we're writing in.
+   * 正在写的文本区域
    */
   private final JTextArea textArea;
   /**
    * A flag whether the text area scrolls.
+   * 一个标示是否文本可以被拖动
    */
   private boolean autoScroll;
 

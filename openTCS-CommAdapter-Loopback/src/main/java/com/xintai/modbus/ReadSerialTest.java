@@ -10,12 +10,16 @@ package com.xintai.modbus;
  * @author Lenovo
  */
 import com.serotonin.messaging.StreamTransport;
+import  com.serotonin.modbus4j.locator.NumericLocator;
 import com.serotonin.io.serial.SerialParameters;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
+import com.serotonin.modbus4j.code.DataType;
+import com.serotonin.modbus4j.code.RegisterRange;
 import com.serotonin.modbus4j.exception.ModbusInitException;
 import com.serotonin.modbus4j.exception.ModbusTransportException;
 import com.serotonin.modbus4j.ip.IpParameters;
+import com.serotonin.modbus4j.locator.NumericLocator;
 import com.serotonin.modbus4j.msg.ReadCoilsRequest;
 import com.serotonin.modbus4j.msg.ReadHoldingRegistersRequest;
 import com.serotonin.modbus4j.msg.ReadHoldingRegistersResponse;
@@ -23,6 +27,7 @@ import com.serotonin.modbus4j.msg.WriteCoilRequest;
 import com.serotonin.modbus4j.msg.WriteRegisterRequest;
 import com.serotonin.modbus4j.msg.WriteRegistersRequest;
 import com.sun.tools.javac.jvm.ByteCodes;
+import com.xintai.kecong.message.ByteQueue;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -97,7 +102,34 @@ public class ReadSerialTest {
       
       
     }
-    
+    	public static short [] arrayCopy(short []... arrays){
+		//数组长度
+		int arrayLength = 0;
+		//目标数组的起始位置
+		int startIndex = 0;
+
+		for(short[] file : arrays){
+			arrayLength = arrayLength + file.length;
+		}
+
+		short[] fileArray = new short[arrayLength];
+
+		for(int i = 0; i < arrays.length; i++){
+
+			if(i > 0){
+				//i为0 时，目标数组的起始位置为0 ,i为1时，目标数组的起始位置为第一个数组长度
+				//i为2时，目标数组的起始位置为第一个数组长度+第二个数组长度
+				startIndex = startIndex + arrays[i-1].length;
+			}
+
+			System.arraycopy(arrays[i], 0, fileArray, startIndex, arrays[i].length);
+
+		}
+
+
+		return fileArray;
+	}
+
      public static void main (String[] args) {
 IpParameters ipParameters = new IpParameters();
         // ipParameters.setHost("99.247.60.96");
@@ -115,9 +147,15 @@ IpParameters ipParameters = new IpParameters();
       try {
         master.init();
   try {
+    
+    NumericLocator num=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,50,DataType.FOUR_BYTE_FLOAT);
+ short[]numbers= num.valueToShorts(2288f);
+  NumericLocator num1=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,54,DataType.FOUR_BYTE_FLOAT);
+short[]numbers1= num1.valueToShorts(389f);
+    arrayCopy(numbers,numbers1);
     master.send(new WriteCoilRequest(5, 7, true));
-    WriteRegistersRequest request = new WriteRegistersRequest(5, 52, new short[]{2,3,3});
-        master.send(request);
+     WriteRegistersRequest request = new WriteRegistersRequest(5, 52,  arrayCopy(numbers,numbers1));
+      master.send(request);
   }
   catch (ModbusTransportException ex) {
     Logger.getLogger(ReadSerialTest.class.getName()).log(Level.SEVERE, null, ex);

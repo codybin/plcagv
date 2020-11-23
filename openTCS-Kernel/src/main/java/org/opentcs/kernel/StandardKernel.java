@@ -60,6 +60,7 @@ final class StandardKernel
   private static final String MSG_NO_USER_MANAGEMENT = "No user management in local kernel";
   /**
    * A map to state providers used when switching kernel states.
+   * 当转换状态的一个映射
    */
   private final Map<Kernel.State, Provider<KernelState>> stateProviders;
   /**

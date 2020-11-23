@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Controls a task that periodically fetches for kernel events.
- *
+ *控制一个任务周期性的获取系统事件
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class KernelEventFetcher
@@ -41,6 +41,7 @@ public class KernelEventFetcher
    */
   private static final Logger LOG = LoggerFactory.getLogger(KernelEventFetcher.class);
   /**
+   * 在事件获取和服务端口要等待的时间
    * The time to wait between event fetches with the service portal (in ms).
    */
   private final long eventFetchInterval = 1;

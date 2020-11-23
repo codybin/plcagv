@@ -248,7 +248,7 @@ public class AttachmentManager
   public Map<String, AttachmentInformation> getAttachmentPool() {
     return attachmentPool;
   }
-
+//终止适配器
   private void disableAndTerminateAdapter(@Nonnull VehicleEntry vehicleEntry) {
     requireNonNull(vehicleEntry, "vehicleEntry");
 
@@ -259,7 +259,7 @@ public class AttachmentManager
       commAdapter.terminate();
     }
   }
-
+//初始化附属的池
   private void initAttachmentPool() {
     vehicleEntryPool.getEntries().forEach((vehicleName, entry) -> {
       List<VehicleCommAdapterDescription> availableCommAdapters
@@ -281,7 +281,7 @@ public class AttachmentManager
                                                    new NullVehicleCommAdapterDescription()));
     });
   }
-
+  //更新信息
   private void updateAttachmentInformation(VehicleEntry entry) {
     String vehicleName = entry.getVehicleName();
     VehicleCommAdapterFactory factory = entry.getCommAdapterFactory();
@@ -303,7 +303,7 @@ public class AttachmentManager
 
   /**
    * Returns a fresh copy of a vehicle from the kernel.
-   *
+   *从内核返回一个车辆的复制
    * @param vehicle The old vehicle instance.
    * @return The fresh vehicle instance.
    */
@@ -314,7 +314,7 @@ public class AttachmentManager
         .filter(updatedVehicle -> Objects.equals(updatedVehicle.getName(), vehicle.getName()))
         .findFirst().orElse(vehicle);
   }
-
+//使能所有的适配器
   private void autoEnableAllAdapters() {
     vehicleEntryPool.getEntries().values().stream()
         .map(entry -> entry.getCommAdapter())
@@ -322,7 +322,7 @@ public class AttachmentManager
         .filter(adapter -> !adapter.isEnabled())
         .forEach(adapter -> adapter.enable());
   }
-
+//断开所有的 适配器
   private void detachAllAdapters() {
     LOG.debug("Detaching vehicle communication adapters...");
     vehicleEntryPool.getEntries().forEach((vehicleName, entry) -> {
@@ -330,7 +330,7 @@ public class AttachmentManager
     });
     LOG.debug("Detached vehicle communication adapters");
   }
-
+//使用名字找到适配器
   @Nullable
   private VehicleCommAdapterFactory findFactoryWithName(@Nullable String name) {
     return commAdapterRegistry.getFactories().stream()
