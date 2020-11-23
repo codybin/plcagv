@@ -16,16 +16,19 @@ import com.serotonin.modbus4j.msg.ReadHoldingRegistersRequest;
 import com.serotonin.modbus4j.msg.ReadHoldingRegistersResponse;
 import com.serotonin.modbus4j.msg.WriteRegistersRequest;
 import com.serotonin.modbus4j.msg.WriteRegistersResponse;
+import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
 import com.xintai.kecong.mesaage.adapter.OpentcsPointToKeCongPoint;
 import com.xintai.kecong.message.DataConvertUtl;
 import com.xintai.plc.message.NavigateControl;
+import com.xintai.plc.message.VehicleParameterSetWithPLC;
 import com.xintai.plc.message.VehicleStatePLC;
 import com.xintai.vehicle.comadpter.StateRequesterTask;
 import java.beans.PropertyChangeEvent;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
@@ -87,7 +90,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
         master.setRetries(0);
         master.init();
     }
-    
+    private int processindex=0;
   @Override
    public void initialize() {
          if (isInitialized()) {
@@ -98,10 +101,32 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
          // if(master.isConnected())
           {
             try {
-            
-              ReadHoldingRegistersRequest readholdingregisters=new ReadHoldingRegistersRequest(5,0,100);
+            switch(processindex)
+         {  
+              case 0:
+              ReadHoldingRegistersRequest readholdingregisters=new ReadHoldingRegistersRequest(5,0,50);
               ReadHoldingRegistersResponse readHoldingRegistersResponse=(ReadHoldingRegistersResponse) master.send(readholdingregisters);
               responsesQueue.add(readHoldingRegistersResponse);
+             processindex++;
+              break;
+         case 1:
+           /*  ReadHoldingRegistersRequest vst=new ReadHoldingRegistersRequest(5,52,10);
+           ReadHoldingRegistersResponse rvst=(ReadHoldingRegistersResponse) master.send(vst);
+           parsevehiclesetting(rvst.getData());
+           */
+           /*  PLCProcessModelTO processModel=new PLCProcessModelTO();
+           VehicleParameterSetWithPLCMode vps =processModel.getVehicleParameterSet();
+           VehicleParameterSetWithPLC vpswplc= new  VehicleParameterSetWithPLC(vps.getAutorun(), vps.getVspeed(), vps.getAspeed());
+           byte[]data= vpswplc.getdata();
+           
+           
+           //1.读取设置变量的信息
+           parsevehiclesetting(data);*/
+           processindex=0;
+           break;
+
+           
+            }
             }
             catch (ModbusTransportException ex) {
               
@@ -109,12 +134,17 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
             }    
           }    
     });
-    
+     
    
     getProcessModel().setVehicleState(Vehicle.State.IDLE);
     initialized = true;
   }
-   
+  private void parsevehiclesetting(byte[] data)
+  {
+  VehicleParameterSetWithPLC v=new VehicleParameterSetWithPLC();
+  VehicleParameterSetWithPLCMode vp=v.decode(data);
+  getProcessModel().setVehicleParameterSet(vp);
+  }
     @Override
   public boolean isInitialized() {
     return initialized;
@@ -140,13 +170,28 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
      java.util.logging.Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
    }
  super.enable();
-  stateRequesterTask.enable();
+ stateRequesterTask.enable();
   }
   
      @Override
   public void propertyChange(PropertyChangeEvent evt) {
     super.propertyChange(evt);
- 
+    if (Objects.equals(evt.getPropertyName(),
+                 PLCProcessModel .Attribute.VEHICLE_SETPARAMETERS.name())) 
+       {
+         
+      try {
+        VehicleParameterSetWithPLCMode vst= getProcessModel().getVehicleParameterSet();
+        if(!vst.isIswrite()) return;
+        VehicleParameterSetWithPLC vstp=new VehicleParameterSetWithPLC(vst.getAutorun(),vst.getVspeed(),vst.getAspeed());
+        WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(5, 52, vstp.getdata());
+         master.send(writeRegistersRequest);
+         System.out.println("com.xintai.plc.comadpater.PLCComAdapter.propertyChange()"+vstp.toString());
+      }
+      catch (ModbusTransportException ex) {
+        Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
+      }
+       }
   }
  @Override
  public synchronized void disable() {
@@ -177,7 +222,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     System.out.println("com.xintai.vehicle.comadpter.KeCongCommAdapter.sendCommand()"+destinationid);
      NavigateControl navigate=new NavigateControl(0, destinationid);
     try {
-      WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(5, 0,DataConvertUtl.bytesToShort(navigate.encodedata()));
+      WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(5,60,navigate.encodedata());
       WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
      orderIds.put(cmd, destinationid);
     }
@@ -255,7 +300,9 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
   return new PLCProcessModelTO().
       setVehicleHost(getProcessModel().getVehicleHost())
       .setVehiclePort(getProcessModel().getVehiclePort()).
-      setPreviousVehicleStateModel(getProcessModel().getPreviousVehicleStateModel()).setVehicleRef(getProcessModel().getVehicleReference());
+      setPreviousVehicleStateModel(getProcessModel().getPreviousVehicleStateModel())
+      .setVehicleParameterSet(getProcessModel().getVehicleParameterSet())
+      .setVehicleRef(getProcessModel().getVehicleReference());
   }
     private enum LoadState {
     EMPTY,

@@ -15,6 +15,44 @@ import java.nio.charset.StandardCharsets;
  * @author Lenovo
  */
 public class DataConvertUtl {
+  
+  public static short [] arrayCopy(short []... arrays){
+		//数组长度
+		int arrayLength = 0;
+		//目标数组的起始位置
+		int startIndex = 0;
+
+		for(short[] file : arrays){
+			arrayLength = arrayLength + file.length;
+		}
+
+		short[] fileArray = new short[arrayLength];
+
+		for(int i = 0; i < arrays.length; i++){
+
+			if(i > 0){
+				//i为0 时，目标数组的起始位置为0 ,i为1时，目标数组的起始位置为第一个数组长度
+				//i为2时，目标数组的起始位置为第一个数组长度+第二个数组长度
+				startIndex = startIndex + arrays[i-1].length;
+			}
+
+			System.arraycopy(arrays[i], 0, fileArray, startIndex, arrays[i].length);
+
+		}
+
+
+		return fileArray;
+	}
+  
+  public static short[] convertToShorts(byte[] data) {
+        short[] sdata = new short[data.length / 2];
+        for (int i = 0; i < sdata.length; i++)
+            sdata[i] = toShort(data[i * 2], data[i * 2 + 1]);
+        return sdata;
+    }
+  private  static short toShort(byte b1, byte b2) {
+        return (short) ((b1 << 8) | (b2 & 0xff));
+    }
   public static short[] bytesToShort(byte[] bytes) {
 		if(bytes==null){
 			return null;
@@ -92,7 +130,20 @@ return byteArrayToInt(tempbyte);
         int intBits = Float.floatToIntBits(data);  
         return getBytes(intBits);  
     }  
-
+ public static byte[] _getBytes(float data)  
+    {  
+        int intBits = Float.floatToIntBits(data);  
+        return _getBytes(intBits);  
+    }  
+public static byte[] _getBytes(int data)  
+    {  
+        byte[] bytes = new byte[4];  
+        bytes[2] = (byte) (data & 0xff);  
+        bytes[3] = (byte) ((data & 0xff00) >> 8);  
+        bytes[0] = (byte) ((data & 0xff0000) >> 16);  
+        bytes[1] = (byte) ((data & 0xff000000) >> 24);  
+        return bytes;  
+    }  
  
 
     public static byte[] getBytes(short data)  

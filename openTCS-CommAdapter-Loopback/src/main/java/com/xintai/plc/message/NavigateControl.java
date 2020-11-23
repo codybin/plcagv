@@ -5,7 +5,11 @@
  */
 package com.xintai.plc.message;
 
+import com.serotonin.modbus4j.code.DataType;
+import com.serotonin.modbus4j.code.RegisterRange;
+import com.serotonin.modbus4j.locator.NumericLocator;
 import com.serotonin.util.queue.ByteQueue;
+import com.xintai.kecong.message.DataConvertUtl;
 
 /**
  *
@@ -20,11 +24,12 @@ public class NavigateControl {
    this.operation=operation;
    this.pathid=pathid;
    }
-  public byte [] encodedata()
+  public short [] encodedata()
   {
-    byteQueue=new ByteQueue();
-    byteQueue.push(operation);
-    byteQueue.push(pathid);
- return byteQueue.popAll();
+     NumericLocator num=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,60,DataType.TWO_BYTE_INT_SIGNED);
+      short[]numbers= num.valueToShorts(operation);
+      NumericLocator num1=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,62,DataType.TWO_BYTE_INT_SIGNED);
+      short[]numbers1= num.valueToShorts(pathid);
+       return DataConvertUtl.arrayCopy(numbers,numbers1);
   }
 }

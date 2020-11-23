@@ -21,6 +21,7 @@ import com.serotonin.modbus4j.msg.ReadHoldingRegistersRequest;
 import com.serotonin.modbus4j.msg.ReadHoldingRegistersResponse;
 import com.serotonin.modbus4j.msg.WriteCoilRequest;
 import com.serotonin.modbus4j.msg.WriteRegisterRequest;
+import com.serotonin.modbus4j.msg.WriteRegistersRequest;
 import com.sun.tools.javac.jvm.ByteCodes;
 import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
@@ -115,8 +116,8 @@ IpParameters ipParameters = new IpParameters();
         master.init();
   try {
     master.send(new WriteCoilRequest(5, 7, true));
-     ReadCoilsRequest request = new ReadCoilsRequest(5, 65534, 1);
-         ReadHoldingRegistersResponse response = (ReadHoldingRegistersResponse) master.send(new ReadHoldingRegistersRequest(5, 0, 1));
+    WriteRegistersRequest request = new WriteRegistersRequest(5, 52, new short[]{2,3,3});
+        master.send(request);
   }
   catch (ModbusTransportException ex) {
     Logger.getLogger(ReadSerialTest.class.getName()).log(Level.SEVERE, null, ex);

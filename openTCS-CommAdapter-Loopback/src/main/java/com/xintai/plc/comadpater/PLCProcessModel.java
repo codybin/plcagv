@@ -5,6 +5,7 @@
  */
 package com.xintai.plc.comadpater;
 
+import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
@@ -56,6 +57,7 @@ public class PLCProcessModel extends VehicleProcessModel  {
                                                   oldValue,
                                                   vehicleHost);
   }
+    
      public synchronized int getVehiclePort() {
     return vehiclePort;
   }
@@ -72,12 +74,28 @@ public class PLCProcessModel extends VehicleProcessModel  {
     getPropertyChangeSupport().firePropertyChange(PLCProcessModel.Attribute.VEHICLE_PORT.name(),
                                                   oldValue,
                                                   vehiclePort);}
-    
-    
+    private  VehicleParameterSetWithPLCMode vehicleset;
+     public synchronized VehicleParameterSetWithPLCMode getVehicleParameterSet() {
+    return vehicleset;
+  }
+
+  /**
+   * Sets the TCP port number the vehicle is listening on.
+   *设置车辆正在监听的端口号码
+   * @param vehiclePort The TCP port number.
+   */
+  public synchronized void setVehicleParameterSet(VehicleParameterSetWithPLCMode vehicleset) {
+    VehicleParameterSetWithPLCMode oldValue = this.vehicleset;
+    this.vehicleset = vehicleset;
+
+    getPropertyChangeSupport().firePropertyChange(PLCProcessModel.Attribute.VEHICLE_SETPARAMETERS.name(),
+                                                  oldValue,
+                                                  vehicleset);}
       public static enum Attribute {   
     VEHICLE_HOST,//车辆主站
     VEHICLE_PORT,//车辆端口
     VEHILCE_STATE,
+    VEHICLE_SETPARAMETERS
     
       }
 }

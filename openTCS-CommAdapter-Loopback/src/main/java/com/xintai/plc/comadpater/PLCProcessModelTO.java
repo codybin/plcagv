@@ -5,6 +5,7 @@
  */
 package com.xintai.plc.comadpater;
 
+import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
@@ -64,6 +65,19 @@ public class PLCProcessModelTO extends  VehicleProcessModelTO{
     public PLCProcessModelTO setVehicleRef(TCSObjectReference<Vehicle> vehicleRef) {
     this.vehicleRef = vehicleRef;
     return this;
+  } private  VehicleParameterSetWithPLCMode vehicleset;
+     public  VehicleParameterSetWithPLCMode getVehicleParameterSet() {
+    return vehicleset;
   }
+
+  /**
+   * Sets the TCP port number the vehicle is listening on.
+   *设置车辆正在监听的端口号码
+   * @param vehiclePort The TCP port number.
+   */
+  public PLCProcessModelTO setVehicleParameterSet(VehicleParameterSetWithPLCMode vehicleset) {
+    this.vehicleset = vehicleset;
+     return this;
+    }
 
 }
