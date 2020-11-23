@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Assigns transport orders to vehicles that are currently not processing any and are not bound to
  * any order sequences.
- *
+ *签约订单到目前没有处理任何订单和绑定到任何订单的车辆
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class AssignFreeOrdersPhase

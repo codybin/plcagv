@@ -51,7 +51,11 @@ public class IsFreelyDispatchableToAnyVehicle
     this.objectService = requireNonNull(objectService, "objectService");
     this.orderReservationPool = requireNonNull(orderReservationPool, "orderReservationPool");
   }
-
+/**
+ * 我们只想核查可分配的订单。过滤掉被其他车辆签约的订单。过滤掉保留的订单。
+ * @param order
+ * @return 
+ */
   @Override
   public boolean test(TransportOrder order) {
     // We only want to check dispatchable transport orders.

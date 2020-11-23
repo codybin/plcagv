@@ -187,7 +187,7 @@ public interface Scheduler
 
     /**
      * Informs this module about a client's current allocation state.
-     *
+     *通知模块一个客户的当前分配状态
      * @param client The client.
      * @param alloc The client's currently allocated resources.
      * @param remainingClaim The client's remaining claim.
@@ -199,7 +199,7 @@ public interface Scheduler
     /**
      * Checks if the resulting system state is safe if the given set of resources
      * would be allocated by the given resource user.
-     *
+     *如果被给定的资源被给定的用户分配，核查是否结果是安全的。
      * @param client The <code>ResourceUser</code> requesting resources set.
      * @param resources The requested resources.
      * @return <code>true</code> if this module thinks the given resources may be allocated for the
@@ -209,7 +209,7 @@ public interface Scheduler
 
     /**
      * Lets this module prepare the given resources so they can be allocated to a client.
-     *
+     *让这个模块准备被给定的资源以便他们可以被分配到一个车辆
      * @param client The client the resources are being prepared for.
      * @param resources The resources to be prepared.
      */
@@ -217,7 +217,7 @@ public interface Scheduler
 
     /**
      * Checks if this module is done preparing the given resources for a client.
-     *
+     *核查是否模块已经为车辆准备了被给定的资源。
      * @param client The client the resources are being prepared for.
      * @param resources The resources to be checked.
      * @return <code>true</code> if the resoruces are prepared for a client.

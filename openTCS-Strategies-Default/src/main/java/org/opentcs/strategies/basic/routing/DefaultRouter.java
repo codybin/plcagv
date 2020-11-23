@@ -328,7 +328,7 @@ public class DefaultRouter
   /**
    * Checks if a route exists for a vehicle of a given type which allows the
    * vehicle to process a given list of drive orders.
-   *
+   *核查是否一个路线对给定类型的车辆存在，该路线允许车辆处理一系列的运输订单。
    * @param startPoint The point at which the route is supposed to start.
    * @param driveOrders The list of drive orders, in the order they are to be
    * processed.
@@ -444,7 +444,7 @@ public class DefaultRouter
 
   /**
    * Returns all points at which a vehicle could process the given drive order.
-   *
+   *返回所有的点，在这些点车辆可以处理给定的订单序列
    * @param driveOrder The drive order to be processed.
    * @return A set of acceptable destination points at which a vehicle could
    * execute the given drive order's operation. If no such points exist, the
