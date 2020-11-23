@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.xintai.informatiomn.SinceTechInformation;
 import java.io.IOException;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -96,7 +97,8 @@ public class V1RequestHandler
   @Override
   public void addRoutes(Service service) {
     requireNonNull(service, "service");
-
+     service.get("/information",
+    this::handleGetXintaiInfor);
     service.get("/events",
                 this::handleGetEvents);
     service.put("/vehicles/:NAME/integrationLevel",
@@ -124,7 +126,11 @@ public class V1RequestHandler
                                                     maxSequenceNo(request),
                                                     timeout(request)));
   }
-
+ private Object handleGetXintaiInfor(Request request, Response response)
+      throws IllegalArgumentException, IllegalStateException {
+    response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
+    return toJson(new SinceTechInformation("znzz","xxx..com","2020"));
+  }
   private Object handlePostTransportOrder(Request request, Response response)
       throws ObjectUnknownException,
              ObjectExistsException,
