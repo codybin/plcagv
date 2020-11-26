@@ -18,3 +18,10 @@
 /openTCS-PlantOverview-Panel-Statistics/build/
 /openTCS-PlantOverview/build/
 /openTCS-PlantOverview-Themes-Default/build/
+/opentcs-kernal-redis-extension/.gradle/
+/opentcs-Kernel-Extension-Redis/.gradle/
+/opentcs-Kernel-Extension-Redis/build/
+/openTCS-Kernel-Extension-Redis/build/
+/openTCS-CommAdapter-Loopback - 副本/build/
+/openTCS-CommAdapter-PLC/build/
+/openTCS-CommAdapter-KeCong/build/

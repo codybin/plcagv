@@ -3,8 +3,6 @@
  */
 package example.virtualvehicle;
 
-import com.xintai.kecongcontrol.ui.KeCongControlForm;
-import tryvehicle.Vehicle;
 import org.opentcs.components.kernel.services.VehicleService;
 
 /**
@@ -34,14 +32,7 @@ public interface AdapterPanelComponentsFactory {
   StatusPanel createStatusPanel(ExampleProcessModelTO processModel,
                                 VehicleService vehicleService);
   
-  /**
-   *
-   * @param processModel
-   * @param vehicleService
-   * @return
-   */
-  Vehicle createVehilePanel(ExampleProcessModelTO processModel,
-                                  VehicleService vehicleService);
+
   /**
    * @param processModel
    * @param vehicleService
