@@ -151,25 +151,31 @@ public class RedisStacticEventLogger
     if (orderNow.hasState(TransportOrder.State.ACTIVE)
         && !orderOld.hasState(TransportOrder.State.ACTIVE)) {
       writeEvent(StatisticsEvent.ORDER_ACTIVATED, orderNow.getName());
+      setprocessingstate(orderNow.getName(),StatisticsEvent.ORDER_ACTIVATED.toString());
     }
     // Has the order been assigned to a vehicle?
     if (orderNow.hasState(TransportOrder.State.BEING_PROCESSED)
         && !orderOld.hasState(TransportOrder.State.BEING_PROCESSED)) {
       writeEvent(StatisticsEvent.ORDER_ASSIGNED, orderNow.getName());
+       setprocessingstate(orderNow.getName(),StatisticsEvent.ORDER_ASSIGNED.toString());
     }
     // Has the order been finished?
     if (orderNow.hasState(TransportOrder.State.FINISHED)
         && !orderOld.hasState(TransportOrder.State.FINISHED)) {
       writeEvent(StatisticsEvent.ORDER_FINISHED_SUCC, orderNow.getName());
+      recordorders(StatisticsEvent.ORDER_FINISHED_SUCC.name(),orderNow.getName());
+       setprocessingstate(orderNow.getName(),StatisticsEvent.ORDER_FINISHED_SUCC.toString());
       // Check the order's deadline. Has it been crossed?
       if (orderNow.getFinishedTime().isAfter(orderNow.getDeadline())) {
         writeEvent(StatisticsEvent.ORDER_CROSSED_DEADLINE, orderNow.getName());
+          setprocessingstate(orderNow.getName(),StatisticsEvent.ORDER_CROSSED_DEADLINE.toString());
       }
     }
     // Has the order failed?
     if (orderNow.hasState(TransportOrder.State.FAILED)
         && !orderOld.hasState(TransportOrder.State.FAILED)) {
       writeEvent(StatisticsEvent.ORDER_FINISHED_FAIL, orderNow.getName());
+       setprocessingstate(orderNow.getName(),StatisticsEvent.ORDER_FINISHED_FAIL.toString());
     }
   }
 
@@ -191,20 +197,24 @@ public class RedisStacticEventLogger
     // Did the vehicle get a transport order?
     if (vehicleNow.getTransportOrder() != null && vehicleOld.getTransportOrder() == null) {
       writeEvent(StatisticsEvent.VEHICLE_STARTS_PROCESSING, vehicleNow.getName());
+       setprocessingstate(vehicleNow.getName(),StatisticsEvent.VEHICLE_STARTS_PROCESSING.toString());   
     }
     // Did the vehicle finish a transport order?
     if (vehicleNow.getTransportOrder() == null && vehicleOld.getTransportOrder() != null) {
       writeEvent(StatisticsEvent.VEHICLE_STOPS_PROCESSING, vehicleNow.getName());
+        setprocessingstate(vehicleNow.getName(),StatisticsEvent.VEHICLE_STOPS_PROCESSING.toString());  
     }
     // Did the vehicle start charging?
     if (vehicleNow.hasState(Vehicle.State.CHARGING)
         && !vehicleOld.hasState(Vehicle.State.CHARGING)) {
       writeEvent(StatisticsEvent.VEHICLE_STARTS_CHARGING, vehicleNow.getName());
+       setprocessingstate(vehicleNow.getName(),StatisticsEvent.VEHICLE_STARTS_CHARGING.toString());  
     }
     // Did the vehicle start charging?
     if (!vehicleNow.hasState(Vehicle.State.CHARGING)
         && vehicleOld.hasState(Vehicle.State.CHARGING)) {
       writeEvent(StatisticsEvent.VEHICLE_STOPS_CHARGING, vehicleNow.getName());
+       setprocessingstate(vehicleNow.getName(),StatisticsEvent.VEHICLE_STOPS_CHARGING.toString());  
     }
     // If the vehicle is processing an order AND is not in state EXECUTING AND
     // it was either EXECUTING before or not processing, yet, consider it being
@@ -214,6 +224,7 @@ public class RedisStacticEventLogger
         && (vehicleOld.hasState(Vehicle.State.EXECUTING)
             || !vehicleOld.hasProcState(Vehicle.ProcState.PROCESSING_ORDER))) {
       writeEvent(StatisticsEvent.VEHICLE_STARTS_WAITING, vehicleNow.getName());
+       setprocessingstate(vehicleNow.getName(),StatisticsEvent.VEHICLE_STARTS_WAITING.toString());  
     }
     // Is the vehicle processing an order AND has its state changed from
     // something else to EXECUTING? - Consider it not blocked any more, then.
@@ -221,6 +232,7 @@ public class RedisStacticEventLogger
         && vehicleNow.hasState(Vehicle.State.EXECUTING)
         && !vehicleOld.hasState(Vehicle.State.EXECUTING)) {
       writeEvent(StatisticsEvent.VEHICLE_STOPS_WAITING, vehicleNow.getName());
+       setprocessingstate(vehicleNow.getName(),StatisticsEvent.VEHICLE_STOPS_WAITING.toString());  
     }
   }
 
@@ -247,13 +259,22 @@ public class RedisStacticEventLogger
       writeEvent(StatisticsEvent.POINT_FREED, pointNow.getName());
     }
   }
-  
+  private void recordorders(String key,String value)
+  {
+     Map<String,String> map=  new HashMap<>();
+   map.put(key,value );
+   jedis.xadd(key, StreamEntryID.NEW_ENTRY, map);  
+  }
+  private void  setprocessingstate(String key,String value)
+  {
+  jedis.set(key+"ProcState", value);
+  }
   private  void  saveinformation(String KeyString,String jsoninformation)
   {
-    Map<String,String> map=  new HashMap<>();
-   map.put(KeyString,jsoninformation );
-   jedis.xadd(KeyString, StreamEntryID.NEW_ENTRY, map);
- // jedis.set(KeyString, jsoninformation);
+    /*  Map<String,String> map=  new HashMap<>();
+    map.put(KeyString,jsoninformation );
+    jedis.xadd(KeyString, StreamEntryID.NEW_ENTRY, map);*/
+ jedis.set(KeyString, jsoninformation);
   }
   
     private <T> T fromJson(String jsonString, Class<T> clazz)
@@ -286,9 +307,9 @@ public class RedisStacticEventLogger
   private void writeEvent(StatisticsEvent event, String objectName) {
     //outputWriter.println(new StatisticsRecord(System.currentTimeMillis(), event, objectName));
   //  jedis.set(event.name(), objectName);
- Map<String,String> map=  new HashMap<>();
-   map.put(event.name(),objectName );
-  jedis.xadd(event.name(), StreamEntryID.NEW_ENTRY, map);
+  /*Map<String,String> map=  new HashMap<>();
+  map.put(event.name(),objectName );
+  jedis.xadd(event.name(), StreamEntryID.NEW_ENTRY, map);*/
  //   jedis.lpush(event.name(),objectName);
   }
 }
