@@ -66,7 +66,6 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.util.CyclicTask;
 import org.opentcs.util.event.EventBus;
 import org.opentcs.util.event.EventHandler;
-import redis.clients.jedis.Jedis;
 
 public class KeCongCommAdapter    extends BasicVehicleCommAdapter implements EventHandler, ConnectionEventListener<KeCongCommandResponse>,TelegramSender{
  private static final Logger LOG = LoggerFactory.getLogger(KeCongCommAdapter.class);
@@ -270,9 +269,7 @@ private  boolean  isconnected=false;
       }
        }
        };
-       stopchargeThread.start();
-   
-     
+       stopchargeThread.start();  
    }
    @Override
   public void onEvent(Object event) {
