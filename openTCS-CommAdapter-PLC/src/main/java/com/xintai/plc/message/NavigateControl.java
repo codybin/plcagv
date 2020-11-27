@@ -29,7 +29,7 @@ public class NavigateControl {
      NumericLocator num=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,60,DataType.TWO_BYTE_INT_SIGNED);
       short[]numbers= num.valueToShorts(operation);
       NumericLocator num1=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,62,DataType.TWO_BYTE_INT_SIGNED);
-      short[]numbers1= num.valueToShorts(pathid);
+      short[]numbers1= num1.valueToShorts(pathid);
        return DataConvertUtl.arrayCopy(numbers,numbers1);
   }
 }
