@@ -46,24 +46,35 @@ return byteQueue._popU2B();
    }
    private void decode() {
       // TODO: implement
-     vehicleStateModel.setPostionx(getfloatdate());
-     vehicleStateModel.setPositiony(getfloatdate());
-     vehicleStateModel.setPositionangle(getfloatdate());
-     vehicleStateModel.setCurrentnavigationstation(getint());
-     vehicleStateModel.setPostionstate(getint());
-    vehicleStateModel.setNavigatestate(getint());
-    vehicleStateModel.setNavigatetype(getint());
-    vehicleStateModel.setPostionlevel(getfloatdate());
-   vehicleStateModel.setBatterypower(getint());
-   vehicleStateModel.setBatterytemprature(getfloatdate());
-   vehicleStateModel.setBatterycurrent(getfloatdate());
-   vehicleStateModel.setBatteryvoltage(getfloatdate());
-   vehicleStateModel.setKilometerintotal(getfloatdate());
-   vehicleStateModel.setTimeintotal(getfloatdate());
-   vehicleStateModel.setCurrentposition(getint());
-   vehicleStateModel.setMapname(getint());
-   vehicleStateModel.setDispaterstate(getint());
-   vehicleStateModel.setKilometertoday(getint());
-   vehicleStateModel.setLoadstate(getint());
+     vehicleStateModel.setChargingSwitch(getint());
+     vehicleStateModel.setBatteryPower(getfloatdate());
+     vehicleStateModel.setBatteryVoltage(getfloatdate());
+     vehicleStateModel.setBatteryCurrent(getfloatdate());
+     vehicleStateModel.setBatteryTemprature(getfloatdate());
+     vehicleStateModel.setAgvNumber(getint());
+     vehicleStateModel.setIP1(getint());
+     vehicleStateModel.setIP2(getint());
+     vehicleStateModel.setIP3(getint());
+     vehicleStateModel.setIP4(getint());
+   vehicleStateModel.setMasterScheduling(getint());
+   vehicleStateModel.setAgvVspeed(getfloatdate());
+   vehicleStateModel.setAgvAspeed(getfloatdate());
+   vehicleStateModel.setTotalMileage(getfloatdate());
+   vehicleStateModel.setRunTime(getfloatdate());
+   vehicleStateModel.setAgvRunState(getint());
+   vehicleStateModel.setErrorErrorCode(getint());
+   vehicleStateModel.setWarningErrorCode(getint());
+   vehicleStateModel.setLastSite(getint());
+   vehicleStateModel.setCurrentSite(getint());
+   vehicleStateModel.setNextSite(getint());
+   vehicleStateModel.setNextTwoSite(getint());
+   vehicleStateModel.setTargetSite(getint());
+   vehicleStateModel.setTargetSiteCarDirection(getint());
+   vehicleStateModel.setPositioningState(getint());
+   vehicleStateModel.setBetweenSiteMileage(getfloatdate());
+   vehicleStateModel.setNavigationalState(getint());
+   vehicleStateModel.setCurrentSchedulingTask(getint());
+   vehicleStateModel.setMaterialStatus(getint());
+   vehicleStateModel.setTaskStatus(getint());
    }
 }

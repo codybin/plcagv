@@ -13,289 +13,458 @@ import java.io.Serializable;
  */
 public class VehicleStateModel implements  Serializable {
 
+
+   private int chargingSwitch;
+   private float batteryPower;
+   private float batteryVoltage;
+   private float batteryCurrent;
+   private float batteryTemprature;
+   private int agvNumber;
+   private int IP1;
+   private int IP2;
+   private int IP3;
+   private int IP4;
+   private int masterScheduling;
+   private float agvVspeed;
+   private float agvAspeed;
+   private float totalMileage;
+   private float runTime;
+   private int agvRunState;
+   private int errorErrorCode;
+   private int warningErrorCode;
+   private int lastSite;
+   private int currentSite;
+   private int nextSite;
+   private int nextTwoSite;
+   private int targetSite;
+   private int targetSiteCarDirection;
+   private int positioningState;
+   private float betweenSiteMileage;
+   private int navigationalState;
+   private int currentSchedulingTask;
+   private int materialStatus;
+   private int taskStatus;
+
   /**
-   * @return the postionx
+   * @return the chargingSwitch
    */
-  public float getPostionx() {
-    return postionx;
+  public int getChargingSwitch() {
+    return chargingSwitch;
   }
 
   /**
-   * @param postionx the postionx to set
+   * @param chargingSwitch the chargingSwitch to set
    */
-  public void setPostionx(float postionx) {
-    this.postionx = postionx;
+  public void setChargingSwitch(int chargingSwitch) {
+    this.chargingSwitch = chargingSwitch;
   }
 
   /**
-   * @return the positiony
+   * @return the batteryPower
    */
-  public float getPositiony() {
-    return positiony;
+  public float getBatteryPower() {
+    return batteryPower;
   }
 
   /**
-   * @param positiony the positiony to set
+   * @param batteryPower the batteryPower to set
    */
-  public void setPositiony(float positiony) {
-    this.positiony = positiony;
+  public void setBatteryPower(float batteryPower) {
+    this.batteryPower = batteryPower;
   }
 
   /**
-   * @return the positionangle
+   * @return the batteryVoltage
    */
-  public float getPositionangle() {
-    return positionangle;
+  public float getBatteryVoltage() {
+    return batteryVoltage;
   }
 
   /**
-   * @param positionangle the positionangle to set
+   * @param batteryVoltage the batteryVoltage to set
    */
-  public void setPositionangle(float positionangle) {
-    this.positionangle = positionangle;
+  public void setBatteryVoltage(float batteryVoltage) {
+    this.batteryVoltage = batteryVoltage;
   }
 
   /**
-   * @return the currentnavigationstation
+   * @return the batteryCurrent
    */
-  public int getCurrentnavigationstation() {
-    return currentnavigationstation;
+  public float getBatteryCurrent() {
+    return batteryCurrent;
   }
 
   /**
-   * @param currentnavigationstation the currentnavigationstation to set
+   * @param batteryCurrent the batteryCurrent to set
    */
-  public void setCurrentnavigationstation(int currentnavigationstation) {
-    this.currentnavigationstation = currentnavigationstation;
+  public void setBatteryCurrent(float batteryCurrent) {
+    this.batteryCurrent = batteryCurrent;
   }
 
   /**
-   * @return the postionstate
+   * @return the batteryTemprature
    */
-  public int getPostionstate() {
-    return postionstate;
+  public float getBatteryTemprature() {
+    return batteryTemprature;
   }
 
   /**
-   * @param postionstate the postionstate to set
+   * @param batteryTemprature the batteryTemprature to set
    */
-  public void setPostionstate(int postionstate) {
-    this.postionstate = postionstate;
+  public void setBatteryTemprature(float batteryTemprature) {
+    this.batteryTemprature = batteryTemprature;
   }
 
   /**
-   * @return the navigatestate
+   * @return the agvNumber
    */
-  public int getNavigatestate() {
-    return navigatestate;
+  public int getAgvNumber() {
+    return agvNumber;
   }
 
   /**
-   * @param navigatestate the navigatestate to set
+   * @param agvNumber the agvNumber to set
    */
-  public void setNavigatestate(int navigatestate) {
-    this.navigatestate = navigatestate;
+  public void setAgvNumber(int agvNumber) {
+    this.agvNumber = agvNumber;
   }
 
   /**
-   * @return the navigatetype
+   * @return the IP1
    */
-  public int getNavigatetype() {
-    return navigatetype;
+  public int getIP1() {
+    return IP1;
   }
 
   /**
-   * @param navigatetype the navigatetype to set
+   * @param IP1 the IP1 to set
    */
-  public void setNavigatetype(int navigatetype) {
-    this.navigatetype = navigatetype;
+  public void setIP1(int IP1) {
+    this.IP1 = IP1;
   }
 
   /**
-   * @return the postionlevel
+   * @return the IP2
    */
-  public float getPostionlevel() {
-    return postionlevel;
+  public int getIP2() {
+    return IP2;
   }
 
   /**
-   * @param postionlevel the postionlevel to set
+   * @param IP2 the IP2 to set
    */
-  public void setPostionlevel(float postionlevel) {
-    this.postionlevel = postionlevel;
+  public void setIP2(int IP2) {
+    this.IP2 = IP2;
   }
 
   /**
-   * @return the batterypower
+   * @return the IP3
    */
-  public int getBatterypower() {
-    return batterypower;
+  public int getIP3() {
+    return IP3;
   }
 
   /**
-   * @param batterypower the batterypower to set
+   * @param IP3 the IP3 to set
    */
-  public void setBatterypower(int batterypower) {
-    this.batterypower = batterypower;
+  public void setIP3(int IP3) {
+    this.IP3 = IP3;
   }
 
   /**
-   * @return the batterytemprature
+   * @return the IP4
    */
-  public float getBatterytemprature() {
-    return batterytemprature;
+  public int getIP4() {
+    return IP4;
   }
 
   /**
-   * @param batterytemprature the batterytemprature to set
+   * @param IP4 the IP4 to set
    */
-  public void setBatterytemprature(float batterytemprature) {
-    this.batterytemprature = batterytemprature;
+  public void setIP4(int IP4) {
+    this.IP4 = IP4;
   }
 
   /**
-   * @return the batterycurrent
+   * @return the masterScheduling
    */
-  public float getBatterycurrent() {
-    return batterycurrent;
+  public int getMasterScheduling() {
+    return masterScheduling;
   }
 
   /**
-   * @param batterycurrent the batterycurrent to set
+   * @param masterScheduling the masterScheduling to set
    */
-  public void setBatterycurrent(float batterycurrent) {
-    this.batterycurrent = batterycurrent;
+  public void setMasterScheduling(int masterScheduling) {
+    this.masterScheduling = masterScheduling;
   }
 
   /**
-   * @return the batteryvoltage
+   * @return the agvVspeed
    */
-  public float getBatteryvoltage() {
-    return batteryvoltage;
+  public float getAgvVspeed() {
+    return agvVspeed;
   }
 
   /**
-   * @param batteryvoltage the batteryvoltage to set
+   * @param agvVspeed the agvVspeed to set
    */
-  public void setBatteryvoltage(float batteryvoltage) {
-    this.batteryvoltage = batteryvoltage;
+  public void setAgvVspeed(float agvVspeed) {
+    this.agvVspeed = agvVspeed;
   }
 
   /**
-   * @return the kilometerintotal
+   * @return the agvAspeed
    */
-  public float getKilometerintotal() {
-    return kilometerintotal;
+  public float getAgvAspeed() {
+    return agvAspeed;
   }
 
   /**
-   * @param kilometerintotal the kilometerintotal to set
+   * @param agvAspeed the agvAspeed to set
    */
-  public void setKilometerintotal(float kilometerintotal) {
-    this.kilometerintotal = kilometerintotal;
+  public void setAgvAspeed(float agvAspeed) {
+    this.agvAspeed = agvAspeed;
   }
 
   /**
-   * @return the timeintotal
+   * @return the totalMileage
    */
-  public float getTimeintotal() {
-    return timeintotal;
+  public float getTotalMileage() {
+    return totalMileage;
   }
 
   /**
-   * @param timeintotal the timeintotal to set
+   * @param totalMileage the totalMileage to set
    */
-  public void setTimeintotal(float timeintotal) {
-    this.timeintotal = timeintotal;
+  public void setTotalMileage(float totalMileage) {
+    this.totalMileage = totalMileage;
   }
 
   /**
-   * @return the currentposition
+   * @return the runTime
    */
-  public int getCurrentposition() {
-    return currentposition;
+  public float getRunTime() {
+    return runTime;
   }
 
   /**
-   * @param currentposition the currentposition to set
+   * @param runTime the runTime to set
    */
-  public void setCurrentposition(int currentposition) {
-    this.currentposition = currentposition;
+  public void setRunTime(float runTime) {
+    this.runTime = runTime;
   }
 
   /**
-   * @return the mapname
+   * @return the agvRunState
    */
-  public int getMapname() {
-    return mapname;
+  public int getAgvRunState() {
+    return agvRunState;
   }
 
   /**
-   * @param mapname the mapname to set
+   * @param agvRunState the agvRunState to set
    */
-  public void setMapname(int mapname) {
-    this.mapname = mapname;
+  public void setAgvRunState(int agvRunState) {
+    this.agvRunState = agvRunState;
   }
 
   /**
-   * @return the dispaterstate
+   * @return the errorErrorCode
    */
-  public int getDispaterstate() {
-    return dispaterstate;
+  public int getErrorErrorCode() {
+    return errorErrorCode;
   }
 
   /**
-   * @param dispaterstate the dispaterstate to set
+   * @param errorErrorCode the errorErrorCode to set
    */
-  public void setDispaterstate(int dispaterstate) {
-    this.dispaterstate = dispaterstate;
+  public void setErrorErrorCode(int errorErrorCode) {
+    this.errorErrorCode = errorErrorCode;
   }
 
   /**
-   * @return the kilometertoday
+   * @return the warningErrorCode
    */
-  public int getKilometertoday() {
-    return kilometertoday;
+  public int getWarningErrorCode() {
+    return warningErrorCode;
   }
 
   /**
-   * @param kilometertoday the kilometertoday to set
+   * @param warningErrorCode the warningErrorCode to set
    */
-  public void setKilometertoday(int kilometertoday) {
-    this.kilometertoday = kilometertoday;
+  public void setWarningErrorCode(int warningErrorCode) {
+    this.warningErrorCode = warningErrorCode;
   }
 
   /**
-   * @return the loadstate
+   * @return the lastSite
    */
-  public int getLoadstate() {
-    return loadstate;
+  public int getLastSite() {
+    return lastSite;
   }
 
   /**
-   * @param loadstate the loadstate to set
+   * @param lastSite the lastSite to set
    */
-  public void setLoadstate(int loadstate) {
-    this.loadstate = loadstate;
+  public void setLastSite(int lastSite) {
+    this.lastSite = lastSite;
   }
+
+  /**
+   * @return the currentSite
+   */
+  public int getCurrentSite() {
+    return currentSite;
+  }
+
+  /**
+   * @param currentSite the currentSite to set
+   */
+  public void setCurrentSite(int currentSite) {
+    this.currentSite = currentSite;
+  }
+
+  /**
+   * @return the nextSite
+   */
+  public int getNextSite() {
+    return nextSite;
+  }
+
+  /**
+   * @param nextSite the nextSite to set
+   */
+  public void setNextSite(int nextSite) {
+    this.nextSite = nextSite;
+  }
+
+  /**
+   * @return the nextTwoSite
+   */
+  public int getNextTwoSite() {
+    return nextTwoSite;
+  }
+
+  /**
+   * @param nextTwoSite the nextTwoSite to set
+   */
+  public void setNextTwoSite(int nextTwoSite) {
+    this.nextTwoSite = nextTwoSite;
+  }
+
+  /**
+   * @return the targetSite
+   */
+  public int getTargetSite() {
+    return targetSite;
+  }
+
+  /**
+   * @param targetSite the targetSite to set
+   */
+  public void setTargetSite(int targetSite) {
+    this.targetSite = targetSite;
+  }
+
+  /**
+   * @return the targetSiteCarDirection
+   */
+  public int getTargetSiteCarDirection() {
+    return targetSiteCarDirection;
+  }
+
+  /**
+   * @param targetSiteCarDirection the targetSiteCarDirection to set
+   */
+  public void setTargetSiteCarDirection(int targetSiteCarDirection) {
+    this.targetSiteCarDirection = targetSiteCarDirection;
+  }
+
+  /**
+   * @return the positioningState
+   */
+  public int getPositioningState() {
+    return positioningState;
+  }
+
+  /**
+   * @param positioningState the positioningState to set
+   */
+  public void setPositioningState(int positioningState) {
+    this.positioningState = positioningState;
+  }
+
+  /**
+   * @return the betweenSiteMileage
+   */
+  public float getBetweenSiteMileage() {
+    return betweenSiteMileage;
+  }
+
+  /**
+   * @param betweenSiteMileage the betweenSiteMileage to set
+   */
+  public void setBetweenSiteMileage(float betweenSiteMileage) {
+    this.betweenSiteMileage = betweenSiteMileage;
+  }
+
+  /**
+   * @return the navigationalState
+   */
+  public int getNavigationalState() {
+    return navigationalState;
+  }
+
+  /**
+   * @param navigationalState the navigationalState to set
+   */
+  public void setNavigationalState(int navigationalState) {
+    this.navigationalState = navigationalState;
+  }
+
+  /**
+   * @return the currentSchedulingTask
+   */
+  public int getCurrentSchedulingTask() {
+    return currentSchedulingTask;
+  }
+
+  /**
+   * @param currentSchedulingTask the currentSchedulingTask to set
+   */
+  public void setCurrentSchedulingTask(int currentSchedulingTask) {
+    this.currentSchedulingTask = currentSchedulingTask;
+  }
+
+  /**
+   * @return the materialStatus
+   */
+  public int getMaterialStatus() {
+    return materialStatus;
+  }
+
+  /**
+   * @param materialStatus the materialStatus to set
+   */
+  public void setMaterialStatus(int materialStatus) {
+    this.materialStatus = materialStatus;
+  }
+
+  /**
+   * @return the taskStatus
+   */
+  public int getTaskStatus() {
+    return taskStatus;
+  }
+
+  /**
+   * @param taskStatus the taskStatus to set
+   */
+  public void setTaskStatus(int taskStatus) {
+    this.taskStatus = taskStatus;
+  }
+
   
-     private float postionx;
-   private float positiony;
-   private float positionangle;
-   private int currentnavigationstation;
-   private int postionstate;
-   private int navigatestate;
-   private int navigatetype;
-   private float postionlevel;
-   private int batterypower;
-   private float batterytemprature;
-   private float batterycurrent;
-   private float batteryvoltage;
-   private float kilometerintotal;
-   private float timeintotal;
-   private int currentposition;
-   private int mapname;
-   private int dispaterstate;
-   private int kilometertoday;
-   private int loadstate;
+ 
 }

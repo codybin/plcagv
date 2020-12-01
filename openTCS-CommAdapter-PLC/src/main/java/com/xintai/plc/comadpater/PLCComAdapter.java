@@ -139,9 +139,9 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
   }
   private void parsevehiclesetting(byte[] data)
   {
-  VehicleParameterSetWithPLC v=new VehicleParameterSetWithPLC();
-  VehicleParameterSetWithPLCMode vp=v.decode(data);
-  getProcessModel().setVehicleParameterSet(vp);
+    /*VehicleParameterSetWithPLC v=new VehicleParameterSetWithPLC();
+    VehicleParameterSetWithPLCMode vp=v.decode(data);
+    getProcessModel().setVehicleParameterSet(vp);*/
   }
     @Override
   public boolean isInitialized() {
@@ -181,7 +181,11 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
       try {
         VehicleParameterSetWithPLCMode vst= getProcessModel().getVehicleParameterSet();
         if(!vst.isIswrite()) return;
-        VehicleParameterSetWithPLC vstp=new VehicleParameterSetWithPLC(vst.getAutorun(),vst.getVspeed(),vst.getAspeed());
+        VehicleParameterSetWithPLC vstp=new VehicleParameterSetWithPLC(vst.getHeartbeatsignal(),vst.getAgvvspeed(),
+                                                                       vst.getAgvaspeed(),vst.getRemotestart(),vst.getNavigationtask(),
+                                                                       vst.getNextsite(),vst.getNexttwosite(),vst.getTargetsitecardirection(),
+                                                                       vst.getTargetsite(),vst.getCurrentschedulingtask(),vst.getMaterialcode(),
+                                                                       vst.getChargingpilestate());
         WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(5, 52, vstp.getdata());
          master.send(writeRegistersRequest);
          System.out.println("com.xintai.plc.comadpater.PLCComAdapter.propertyChange()"+vstp.toString());
@@ -218,11 +222,17 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
         ? ((Point) selectedItem).getName() : selectedItem.toString();
     int destinationid=new  OpentcsPointToKeCongPoint(destinationIdString).getIntPoint(); 
     System.out.println("com.xintai.vehicle.comadpter.KeCongCommAdapter.sendCommand()"+destinationid);
-     NavigateControl navigate=new NavigateControl(0, destinationid);
+    
     try {
-      WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(5,60,navigate.encodedata());
-      WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
-     orderIds.put(cmd, destinationid);
+      getProcessModel().setNextcurrentnavigationpoint(destinationid);
+      NavigateControl navigateControl =new NavigateControl().setCurrentstation(getProcessModel().getCurrentnavigationpoint())
+                                            .setNextstation(getProcessModel().getNextcurrentnavigationpoint())
+                                            .setOperation(0)
+                                            .setTargetstation(1);
+         System.out.println("com.xintai.plc.comadpater.PLCComAdapter.sendCommand()"+navigateControl.toString());
+          WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(5,60,navigateControl.encodedata());
+          WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
+          orderIds.put(cmd, destinationid);
     }
     catch (ModbusTransportException ex) {
       Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
@@ -344,59 +354,59 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     }
     private void updatepostion(VehicleStateModel curVehicleStateModel,VehicleStateModel previousStateModel)
     {
-    if(curVehicleStateModel.getCurrentposition()==previousStateModel.getCurrentposition())
+      if(curVehicleStateModel.getCurrentSite()==previousStateModel.getCurrentSite())
       return;
-    getProcessModel().setVehiclePosition("Point-"+String.format("%04d",curVehicleStateModel.getCurrentposition()));
+       getProcessModel().setVehiclePosition("Point-"+String.format("%04d",curVehicleStateModel.getCurrentSite()));
     }
     private  void  updatestate(VehicleStateModel curVehicleStateModel,VehicleStateModel previousStateModel)
    {
-    if(curVehicleStateModel.getNavigatestate()==previousStateModel.getNavigatestate())
-      return;
-    getProcessModel().setVehicleState(translateState(curVehicleStateModel.getNavigatestate()));
-    }
-    private Vehicle.State  translateState(int data)
-    {
-    switch(data)
-    {
-      case 1:
-        return Vehicle.State.IDLE;
-      case 2:
-        return Vehicle.State.EXECUTING;
-       case 3:
-        return Vehicle.State.CHARGING;
-    default:
-      return  Vehicle.State.UNAVAILABLE;
-    }
+     if(curVehicleStateModel.getNavigationalState()==previousStateModel.getNavigationalState())
+     return;
+      getProcessModel().setVehicleState(translateState(curVehicleStateModel.getNavigationalState()));
+     }
+     private Vehicle.State  translateState(int data)
+     {
+     switch(data)
+     {
+     case 1:
+     return Vehicle.State.IDLE;
+     case 2:
+     return Vehicle.State.EXECUTING;
+     case 3:
+     return Vehicle.State.CHARGING;
+     default:
+     return  Vehicle.State.UNAVAILABLE;
+     }
     }
     private  void  updateorder(VehicleStateModel curVehicleStateModel,VehicleStateModel previousStateModel)
    {
-      if(curVehicleStateModel.getCurrentposition()== 0) {
-      return;
-    }
-    // If the last finished order ID hasn't changed, don't bother.
-    if (curVehicleStateModel.getCurrentposition()== previousStateModel.getCurrentposition()) {
-    return;
-    }
-    // Check if the new finished order ID is in the queue of sent orders.
-    // If yes, report all orders up to that one as finished.
-    if (!orderIds.containsValue(curVehicleStateModel.getCurrentposition())) {
-      LOG.debug("{}: Ignored finished order ID {} (reported by vehicle, not found in sent queue).",
-                getName(),
-                curVehicleStateModel.getCurrentposition());
-      return;
-    }
-    Iterator<MovementCommand> cmdIter = getSentQueue().iterator();
-    boolean finishedAll = false;
-    while (!finishedAll && cmdIter.hasNext()) {
-      MovementCommand cmd = cmdIter.next();
-      cmdIter.remove();
-      int orderId = orderIds.remove(cmd);
-      if (orderId == curVehicleStateModel.getCurrentposition()) {
-      finishedAll = true;
-      }
-      LOG.info("{}: Reporting command with order ID {} as executed: {}", getName(), orderId, cmd);
-      getProcessModel().commandExecuted(cmd);
-    }
+     if(curVehicleStateModel.getCurrentSite()== 0) {
+     return;
+     }
+     // If the last finished order ID hasn't changed, don't bother.
+     if (curVehicleStateModel.getCurrentSite()== previousStateModel.getCurrentSite()) {
+     return;
+     }
+     // Check if the new finished order ID is in the queue of sent orders.
+     // If yes, report all orders up to that one as finished.
+     if (!orderIds.containsValue(curVehicleStateModel.getCurrentSite())) {
+     LOG.debug("{}: Ignored finished order ID {} (reported by vehicle, not found in sent queue).",
+     getName(),
+     curVehicleStateModel.getCurrentSite());
+     return;
+     }
+     Iterator<MovementCommand> cmdIter = getSentQueue().iterator();
+     boolean finishedAll = false;
+     while (!finishedAll && cmdIter.hasNext()) {
+     MovementCommand cmd = cmdIter.next();
+     cmdIter.remove();
+     int orderId = orderIds.remove(cmd);
+     if (orderId == curVehicleStateModel.getCurrentSite()) {
+     finishedAll = true;
+     }
+     LOG.info("{}: Reporting command with order ID {} as executed: {}", getName(), orderId, cmd);
+     getProcessModel().commandExecuted(cmd);
+     }
     }
     
   }

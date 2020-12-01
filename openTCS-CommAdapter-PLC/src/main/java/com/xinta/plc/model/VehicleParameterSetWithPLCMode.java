@@ -13,6 +13,11 @@ import java.io.Serializable;
  */
 public class VehicleParameterSetWithPLCMode implements Serializable{
 
+  @Override
+  public String toString() {
+    return "VehicleParameterSetWithPLCMode{" + "heartbeatsignal=" + heartbeatsignal + ", agvvspeed=" + agvvspeed + ", agvaspeed=" + agvaspeed + ", remotestart=" + remotestart + ", navigationtask=" + navigationtask + ", nextsite=" + nextsite + ", nexttwosite=" + nexttwosite + ", targetsitecardirection=" + targetsitecardirection + ", targetsite=" + targetsite + ", currentschedulingtask=" + currentschedulingtask + ", materialcode=" + materialcode + ", chargingpilestate=" + chargingpilestate + ", iswrite=" + iswrite + '}';
+  }
+
   /**
    * @return the iswrite
    */
@@ -27,63 +32,210 @@ public class VehicleParameterSetWithPLCMode implements Serializable{
     this.iswrite = iswrite;
   }
 
-  @Override
-  public String toString() {
-    return "VehicleParameterSetWithPLCMode{" + "autorun=" + autorun + ", vspeed=" + vspeed + ", aspeed=" + aspeed + '}';
-  }
+ 
 
   /**
    * @return the autorun
    */
-  public int getAutorun() {
-    return autorun;
-  }
-
-  /**
-   * @param autorun the autorun to set
-   */
-  public void setAutorun(int autorun) {
-    this.autorun = autorun;
-  }
-
-  /**
-   * @return the vspeed
-   */
-  public float getVspeed() {
-    return vspeed;
-  }
-
-  /**
-   * @param vspeed the vspeed to set
-   */
-  public void setVspeed(float vspeed) {
-    this.vspeed = vspeed;
-  }
-
-  /**
-   * @return the aspeed
-   */
-  public float getAspeed() {
-    return aspeed;
-  }
-
-  /**
-   * @param aspeed the aspeed to set
-   */
-  public void setAspeed(float aspeed) {
-    this.aspeed = aspeed;
-  }
-    private int autorun;
-  private float vspeed;
-   private float aspeed;
+  
+  private int heartbeatsignal;
+  private float agvvspeed;
+  private float agvaspeed;
+  private int remotestart;
+  private int navigationtask;
+  private int nextsite;
+  private int nexttwosite;
+  private int targetsitecardirection;
+  private int targetsite;
+  private int currentschedulingtask;
+  private int materialcode;
+  private int chargingpilestate;
   private  boolean iswrite;
-  public VehicleParameterSetWithPLCMode(  int autorun,
-   float vspeed,
-   float aspeed,boolean iswrite)
-  {
-    this.iswrite=iswrite;
-  this.aspeed=aspeed;
-  this.autorun=autorun;
-  this.vspeed=vspeed;
+  public VehicleParameterSetWithPLCMode(int heartbeatsignal, float agvvspeed, float agvaspeed,
+                                        int remotestart, int navigationtask, int nextsite,
+                                        int nexttwosite, int targetsitecardirection, int targetsite,
+                                        int currentschedulingtask, int materialcode,
+                                        int chargingpilestate, boolean iswrite) {
+    this.heartbeatsignal = heartbeatsignal;
+    this.agvvspeed = agvvspeed;
+    this.agvaspeed = agvaspeed;
+    this.remotestart = remotestart;
+    this.navigationtask = navigationtask;
+    this.nextsite = nextsite;
+    this.nexttwosite = nexttwosite;
+    this.targetsitecardirection = targetsitecardirection;
+    this.targetsite = targetsite;
+    this.currentschedulingtask = currentschedulingtask;
+    this.materialcode = materialcode;
+    this.chargingpilestate = chargingpilestate;
+    this.iswrite = iswrite;
+  }
+
+  /**
+   * @return the heartbeatsignal
+   */
+  public int getHeartbeatsignal() {
+    return heartbeatsignal;
+  }
+
+  /**
+   * @param heartbeatsignal the heartbeatsignal to set
+   */
+  public void setHeartbeatsignal(int heartbeatsignal) {
+    this.heartbeatsignal = heartbeatsignal;
+  }
+
+  /**
+   * @return the agvvspeed
+   */
+  public float getAgvvspeed() {
+    return agvvspeed;
+  }
+
+  /**
+   * @param agvvspeed the agvvspeed to set
+   */
+  public void setAgvvspeed(float agvvspeed) {
+    this.agvvspeed = agvvspeed;
+  }
+
+  /**
+   * @return the agvaspeed
+   */
+  public float getAgvaspeed() {
+    return agvaspeed;
+  }
+
+  /**
+   * @param agvaspeed the agvaspeed to set
+   */
+  public void setAgvaspeed(float agvaspeed) {
+    this.agvaspeed = agvaspeed;
+  }
+
+  /**
+   * @return the remotestart
+   */
+  public int getRemotestart() {
+    return remotestart;
+  }
+
+  /**
+   * @param remotestart the remotestart to set
+   */
+  public void setRemotestart(int remotestart) {
+    this.remotestart = remotestart;
+  }
+
+  /**
+   * @return the navigationtask
+   */
+  public int getNavigationtask() {
+    return navigationtask;
+  }
+
+  /**
+   * @param navigationtask the navigationtask to set
+   */
+  public void setNavigationtask(int navigationtask) {
+    this.navigationtask = navigationtask;
+  }
+
+  /**
+   * @return the nextsite
+   */
+  public int getNextsite() {
+    return nextsite;
+  }
+
+  /**
+   * @param nextsite the nextsite to set
+   */
+  public void setNextsite(int nextsite) {
+    this.nextsite = nextsite;
+  }
+
+  /**
+   * @return the nexttwosite
+   */
+  public int getNexttwosite() {
+    return nexttwosite;
+  }
+
+  /**
+   * @param nexttwosite the nexttwosite to set
+   */
+  public void setNexttwosite(int nexttwosite) {
+    this.nexttwosite = nexttwosite;
+  }
+
+  /**
+   * @return the targetsitecardirection
+   */
+  public int getTargetsitecardirection() {
+    return targetsitecardirection;
+  }
+
+  /**
+   * @param targetsitecardirection the targetsitecardirection to set
+   */
+  public void setTargetsitecardirection(int targetsitecardirection) {
+    this.targetsitecardirection = targetsitecardirection;
+  }
+
+  /**
+   * @return the targetsite
+   */
+  public int getTargetsite() {
+    return targetsite;
+  }
+
+  /**
+   * @param targetsite the targetsite to set
+   */
+  public void setTargetsite(int targetsite) {
+    this.targetsite = targetsite;
+  }
+
+  /**
+   * @return the currentschedulingtask
+   */
+  public int getCurrentschedulingtask() {
+    return currentschedulingtask;
+  }
+
+  /**
+   * @param currentschedulingtask the currentschedulingtask to set
+   */
+  public void setCurrentschedulingtask(int currentschedulingtask) {
+    this.currentschedulingtask = currentschedulingtask;
+  }
+
+  /**
+   * @return the materialcode
+   */
+  public int getMaterialcode() {
+    return materialcode;
+  }
+
+  /**
+   * @param materialcode the materialcode to set
+   */
+  public void setMaterialcode(int materialcode) {
+    this.materialcode = materialcode;
+  }
+
+  /**
+   * @return the chargingpilestate
+   */
+  public int getChargingpilestate() {
+    return chargingpilestate;
+  }
+
+  /**
+   * @param chargingpilestate the chargingpilestate to set
+   */
+  public void setChargingpilestate(int chargingpilestate) {
+    this.chargingpilestate = chargingpilestate;
   }
 }
