@@ -19,6 +19,34 @@ import static org.opentcs.util.Assertions.checkInRange;
  */
 public class PLCProcessModel extends VehicleProcessModel  {
 
+  private int currentnavigationpoint;
+  private int nextcurrentnavigationpoint;
+
+  public int getCurrentnavigationpoint() {
+    return currentnavigationpoint;
+  }
+
+  public void setCurrentnavigationpoint(int currentnavigationpoint) {
+    this.currentnavigationpoint = currentnavigationpoint;
+  }
+
+  public int getNextcurrentnavigationpoint() {
+    return nextcurrentnavigationpoint;
+  }
+
+  public void setNextcurrentnavigationpoint(int nextcurrentnavigationpoint) {
+    int oldvalue=this.nextcurrentnavigationpoint;
+    this.nextcurrentnavigationpoint = nextcurrentnavigationpoint;
+    if(oldvalue!=0)
+    {
+      setCurrentnavigationpoint(oldvalue);    
+    }else
+    {    
+    setCurrentnavigationpoint(nextcurrentnavigationpoint);
+    }
+  }
+  
+  
   /**
    * @return the previousVehicleStateModel
    */

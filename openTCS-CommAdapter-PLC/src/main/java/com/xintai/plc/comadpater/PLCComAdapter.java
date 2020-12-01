@@ -218,11 +218,17 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
         ? ((Point) selectedItem).getName() : selectedItem.toString();
     int destinationid=new  OpentcsPointToKeCongPoint(destinationIdString).getIntPoint(); 
     System.out.println("com.xintai.vehicle.comadpter.KeCongCommAdapter.sendCommand()"+destinationid);
-     NavigateControl navigate=new NavigateControl(0, destinationid);
+    
     try {
-      WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(5,60,navigate.encodedata());
-      WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
-     orderIds.put(cmd, destinationid);
+      getProcessModel().setNextcurrentnavigationpoint(destinationid);
+      NavigateControl navigateControl =new NavigateControl().setCurrentstation(getProcessModel().getCurrentnavigationpoint())
+                                            .setNextstation(getProcessModel().getNextcurrentnavigationpoint())
+                                            .setOperation(0)
+                                            .setTargetstation(1);
+         System.out.println("com.xintai.plc.comadpater.PLCComAdapter.sendCommand()"+navigateControl.toString());
+          WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(5,60,navigateControl.encodedata());
+          WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
+          orderIds.put(cmd, destinationid);
     }
     catch (ModbusTransportException ex) {
       Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
