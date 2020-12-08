@@ -655,11 +655,23 @@ if(commAdapter instanceof  KeCongCommAdapter)
   private void handlePlCProcessModelEvent(PropertyChangeEvent evt) {
    
     if (Objects.equals(evt.getPropertyName(),PLCProcessModel .Attribute.CancelTransport.name())) {
-   
-      CancelTransportModel  cancelTransportModel=(CancelTransportModel)evt.getNewValue();
-      withdrawByVehicle(cancelTransportModel.isImmediate(),cancelTransportModel.isDisableVehicle());
+              
+         PLCProcessModel pLCProcessModel=(PLCProcessModel)evt.getSource();
+         Vehicle currVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference()); //要获得最新消息，必须要用这个，否则获得的信息不是最新消息
+              // System.out.println(currVehicle.toString());
+             if(currVehicle.getTransportOrder()!=null)
+                  {  System.out.println(currVehicle.getTransportOrder().getName());
+                  if(!"".equals(currVehicle.getTransportOrder().getName()))
+                  {
+                  withdrawByVehicle(pLCProcessModel.getCancelTransportModel().isImmediate(),pLCProcessModel.getCancelTransportModel().isDisableVehicle());
+                  }
+                  }else
+                  {
+                     //停止车辆
+                  }
+                }
     }
-  }
+  
 
   private void updateVehiclePrecisePosition(Triple precisePosition)
       throws ObjectUnknownException {
@@ -1076,6 +1088,7 @@ if(commAdapter instanceof  KeCongCommAdapter)
   //添加取消订单逻辑
   public void withdrawByVehicle(boolean immediate, boolean disableVehicle)
       throws ObjectUnknownException {
+     
       if (disableVehicle) {
         vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
                                                      Vehicle.IntegrationLevel.TO_BE_RESPECTED);

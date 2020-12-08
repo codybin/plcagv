@@ -7,6 +7,7 @@ package com.xintai.plc.comadpater;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+import com.xinta.plc.model.CancelTransportModel;
 import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
 import com.xintai.messageserviceinterface.InterfaceMessageService;
@@ -87,7 +88,19 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
               case 0:
              VehicleStatePLC vehicleStatePLC= interfaceMessageService.SendStateRequest();
               if(vehicleStatePLC!=null)
-              responsesQueue.add(vehicleStatePLC);
+              {
+               // System.out.println(vehicleStatePLC.GetVehicleStateModel().getErrorErrorCode());
+                if(vehicleStatePLC.GetVehicleStateModel().getErrorErrorCode()==0)
+                {
+                  responsesQueue.add(vehicleStatePLC);
+                }else 
+                { 
+                  VehicleStateModel currentVehicleStateModel= vehicleStatePLC.GetVehicleStateModel(); 
+                    getProcessModel().setPreviousVehicleStateModel(currentVehicleStateModel);
+                   CancelTransportModel cancelTransportModel=new CancelTransportModel(true, false);
+                   getProcessModel().setCancelTransportModel(cancelTransportModel);
+                }
+              }
              processindex++;
               break;
          case 1:
@@ -247,7 +260,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
   if (message instanceof SetSpeedMultiplier) {
       SetSpeedMultiplier lsMessage = (SetSpeedMultiplier) message;
       int multiplier = lsMessage.getMultiplier();
-      // getProcessModel().setVehiclePaused(multiplier == 0);
+     //  getProcessModel().setVehiclePaused(multiplier == 0);
     }else if(message instanceof SetFinshMarkFromMes )
     {
       SetFinshMarkFromMes setfinshmarkfrommes=(SetFinshMarkFromMes)message;
@@ -378,14 +391,11 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
      {System.out.println("1");
        if(cmd.isFinalMovement()&cmd.isWithoutOperation())
        {
-      MovementCommand cmd1= getSentQueue().remove();
       System.out.println("2");
-      if(cmd==cmd1)
-      {System.out.println("3");
+    System.out.println("3");
      System.out.println("com.xintai.plc.comadpater.PLCComAdapter.VehicleActuralTask.excutefinalaction()");
      excuteActionAfterFinalOperation(cmd);
-     System.out.println("4");
-      }
+     System.out.println("4");   
        }else if(!cmd.isWithoutOperation()&cmd.isFinalMovement())
        {    
      System.out.println("5");
@@ -393,23 +403,21 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
      getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
      Thread t=new Thread(new ExcuteFinalAction(cmd),"excutefinalaction");
      t.start();
-     /*   try {
-     Thread.sleep(10000);
-     }
-     catch (InterruptedException ex) {
-     Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
-     }
-     System.out.println("send mark true");
-     getProcessModel().setFinshmarkfromes(true);*/
-     System.out.println("com.xintai.plc.comadpater.PLCComAdapter.VehicleActuralTask.excutefinalaction()");
        }    
      }
      private void excuteActionAfterFinalOperation(MovementCommand cmd)
      {
-     int orderId = orderIds.remove(cmd);
+        if(cmd!= getSentQueue().peek())
+       {
+       return;
+       }
+     getSentQueue().poll();
+     orderIds.remove(cmd);
      getProcessModel().commandExecuted(cmd);
      getProcessModel().setSingleStepModeEnabled(false);
      getProcessModel().setVehicleState(Vehicle.State.IDLE);
+     getProcessModel().setCurrentnavigationpoint(0);
+     getProcessModel().setNextcurrentnavigationpoint(0);
      lastmcdmark=false;
      }
      private  class ExcuteFinalAction implements Runnable
@@ -432,8 +440,6 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
          try {
            System.out.println("before");
            getProcessModel().getObjectForMesFinshWork().wait();
-           excuteActionAfterFinalOperation(cmd);
-            System.out.println("after");
          }
          catch (InterruptedException ex) {
            Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
@@ -441,6 +447,8 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
        }
        }
          System.out.println("end");
+            excuteActionAfterFinalOperation(cmd);
+            System.out.println("after");
        getProcessModel().setFinshmarkfromes(false);
      }
      
@@ -497,6 +505,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
       MovementCommand movementCommand= getMovementCommandsBufferQueue().peek();
       if(movementCommand!=null)
       {
+        if(getProcessModel().getPreviousVehicleStateModel().getAgvRunState()==2)
       interfaceMessageService.SendNavigateComand(movementCommand,getProcessModel());
       }
     }
