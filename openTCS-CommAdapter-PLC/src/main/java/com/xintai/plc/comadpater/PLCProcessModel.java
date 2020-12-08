@@ -5,6 +5,7 @@
  */
 package com.xintai.plc.comadpater;
 
+import com.xinta.plc.model.CancelTransportModel;
 import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
 import static java.util.Objects.requireNonNull;
@@ -18,10 +19,64 @@ import static org.opentcs.util.Assertions.checkInRange;
  * @author Lenovo
  */
 public class PLCProcessModel extends VehicleProcessModel  {
+ 
+ private CancelTransportModel cancelTransportModel;
+
+  public synchronized CancelTransportModel getCancelTransportModel() {
+    return cancelTransportModel;
+  }
+
+  public void setCancelTransportModel(CancelTransportModel cancelTransportModel) {
+    CancelTransportModel oldValue = this.cancelTransportModel;
+     this.cancelTransportModel = cancelTransportModel;
+
+    getPropertyChangeSupport().firePropertyChange(Attribute.CancelTransport.name(),
+                                                  oldValue,
+                                                  cancelTransportModel);
+  }
+ 
+  private final Object object=new Object();
+
+  public Object getObjectForMesFinshWork() {
+    return object;
+  }
 
   private int currentnavigationpoint;
   private int nextcurrentnavigationpoint;
+  private boolean singleStepModeEnabled;
+  private boolean  finshmarkfromes;
 
+  public synchronized boolean isFinshmarkfromes() {
+    return finshmarkfromes;
+  }
+
+  public  void setFinshmarkfromes(boolean finshmarkfromes) {
+    this.finshmarkfromes = finshmarkfromes;
+    synchronized(object)
+    {
+      object.notify();
+    }
+  }
+  
+   public synchronized void setSingleStepModeEnabled(final boolean mode) {
+    boolean oldValue = singleStepModeEnabled;
+    singleStepModeEnabled = mode;
+
+    getPropertyChangeSupport().firePropertyChange(Attribute.SINGLE_STEP_MODE.name(),
+                                                  oldValue,
+                                                  mode);
+  }
+
+  /**
+   * Returns this communication adapter's <em>single step mode</em> flag.
+   *
+   * @return <code>true</code> if, and only if, this adapter is currently in
+   * single step mode.
+   */
+  public synchronized boolean isSingleStepModeEnabled() {
+    return singleStepModeEnabled;
+  }
+  
   public int getCurrentnavigationpoint() {
     return currentnavigationpoint;
   }
@@ -123,7 +178,8 @@ public class PLCProcessModel extends VehicleProcessModel  {
     VEHICLE_HOST,//车辆主站
     VEHICLE_PORT,//车辆端口
     VEHILCE_STATE,
-    VEHICLE_SETPARAMETERS
-    
+    VEHICLE_SETPARAMETERS,
+    SINGLE_STEP_MODE,
+    CancelTransport
       }
 }
