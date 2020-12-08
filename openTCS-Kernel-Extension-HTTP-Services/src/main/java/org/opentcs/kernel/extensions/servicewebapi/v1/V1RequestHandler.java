@@ -101,6 +101,8 @@ public class V1RequestHandler
     this::handleGetXintaiInfor);
     service.get("/events",
                 this::handleGetEvents);
+     service.put("/vehicles/:NAME/finshmark",
+                this::handlePutFinshWork);
     service.put("/vehicles/:NAME/integrationLevel",
                 this::handlePutVehicleIntegrationLevel);
     service.post("/vehicles/:NAME/withdrawal",
@@ -187,7 +189,15 @@ public class V1RequestHandler
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return toJson(statusInformationProvider.getVehicleStateByName(request.params(":NAME")));
   }
-
+ private Object handlePutFinshWork(Request request, Response response)
+      throws ObjectUnknownException, IllegalArgumentException {
+    statusInformationProvider.putMESFinshWork(
+        request.params(":NAME"),
+      valueIfKeyPresent(request.queryMap(), "newValue")
+    );
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
   private Object handlePutVehicleIntegrationLevel(Request request, Response response)
       throws ObjectUnknownException, IllegalArgumentException {
     statusInformationProvider.putVehicleIntegrationLevel(
