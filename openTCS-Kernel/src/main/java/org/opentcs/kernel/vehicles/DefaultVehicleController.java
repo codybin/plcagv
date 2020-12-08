@@ -8,6 +8,8 @@
 package org.opentcs.kernel.vehicles;
 
 import com.google.inject.assistedinject.Assisted;
+import com.xinta.plc.model.CancelTransportModel;
+import com.xintai.plc.comadpater.PLCProcessModel;
 import com.xintai.vehicle.comadpter.KeCongCommAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -644,6 +646,19 @@ if(commAdapter instanceof  KeCongCommAdapter)
                                             propUpdate.getValue());
       }
     }
+    //添加以下逻辑,后续对不同的车辆添加不同模型。不想把服务所有的信息添加到单独类中。
+    if(evt.getSource() instanceof PLCProcessModel )
+    {
+      handlePlCProcessModelEvent(evt);
+    }
+  }
+  private void handlePlCProcessModelEvent(PropertyChangeEvent evt) {
+   
+    if (Objects.equals(evt.getPropertyName(),PLCProcessModel .Attribute.CancelTransport.name())) {
+   
+      CancelTransportModel  cancelTransportModel=(CancelTransportModel)evt.getNewValue();
+      withdrawByVehicle(cancelTransportModel.isImmediate(),cancelTransportModel.isDisableVehicle());
+    }
   }
 
   private void updateVehiclePrecisePosition(Triple precisePosition)
@@ -1058,4 +1073,13 @@ if(commAdapter instanceof  KeCongCommAdapter)
     }
     return result;
   }
+  //添加取消订单逻辑
+  public void withdrawByVehicle(boolean immediate, boolean disableVehicle)
+      throws ObjectUnknownException {
+      if (disableVehicle) {
+        vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(),
+                                                     Vehicle.IntegrationLevel.TO_BE_RESPECTED);
+      }
+      dispatcherService.withdrawByVehicle(vehicle.getReference(), immediate);
+    }
 }
