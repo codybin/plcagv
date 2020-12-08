@@ -7,21 +7,13 @@ package com.xintai.plc.comadpater;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import com.serotonin.modbus4j.ModbusFactory;
-import com.serotonin.modbus4j.ModbusMaster;
-import com.serotonin.modbus4j.exception.ModbusInitException;
-import com.serotonin.modbus4j.exception.ModbusTransportException;
-import com.serotonin.modbus4j.ip.IpParameters;
-import com.serotonin.modbus4j.msg.ReadHoldingRegistersRequest;
-import com.serotonin.modbus4j.msg.ReadHoldingRegistersResponse;
-import com.serotonin.modbus4j.msg.WriteRegistersRequest;
-import com.serotonin.modbus4j.msg.WriteRegistersResponse;
 import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
-import com.xintai.adapter.OpentcsPointToKeCongPoint;
-import com.xintai.plc.message.NavigateControl;
+import com.xintai.messageserviceinterface.InterfaceMessageService;
+import com.xintai.messageserviceinterface.MessageService;
 import com.xintai.plc.message.VehicleParameterSetWithPLC;
 import com.xintai.plc.message.VehicleStatePLC;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.util.Iterator;
 import java.util.List;
@@ -35,14 +27,16 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
+import javax.swing.Action;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
-import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
+import org.opentcs.drivers.vehicle.messages.SetFinshMarkFromMes;
+import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
 import org.opentcs.util.CyclicTask;
 import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.util.event.EventBus;
@@ -61,7 +55,8 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
   private  boolean  initialized;
   private StateRequesterTask stateRequesterTask;
   private VehicleActuralTask vehicleActuralCyclicTask;
-  private  ModbusMaster master;
+ private  VehicleMessageSendTask vehicleMessageSendTask;
+ private final  InterfaceMessageService interfaceMessageService;
    private final Map<MovementCommand, Integer> orderIds = new ConcurrentHashMap<>();
   
 @Inject
@@ -74,20 +69,9 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     this.componentsFactory = requireNonNull( componentsFactory, "componentsFactory");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.eventBus = requireNonNull(eventBus, "eventBus");
+    interfaceMessageService=new MessageService("127.0.0.1",502);
   }
   
-    private  void initplc () throws ModbusInitException
-    {
-     IpParameters ipParameters = new IpParameters();
-        ipParameters.setHost("127.0.0.1");//后续可以用getprocemodle传进来
-        ipParameters.setPort(502);
-        ipParameters.setEncapsulated(false);
-        ModbusFactory modbusFactory = new ModbusFactory();
-        master = modbusFactory.createTcpMaster(ipParameters, true);
-        master.setTimeout(8000);
-        master.setRetries(0);
-        master.init();
-    }
     private int processindex=0;
   @Override
    public void initialize() {
@@ -98,13 +82,12 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
      this.stateRequesterTask = componentsFactory.createStateRequesterTask(e -> {
          // if(master.isConnected())
           {
-            try {
             switch(processindex)
          {  
               case 0:
-              ReadHoldingRegistersRequest readholdingregisters=new ReadHoldingRegistersRequest(5,0,50);
-              ReadHoldingRegistersResponse readHoldingRegistersResponse=(ReadHoldingRegistersResponse) master.send(readholdingregisters);
-              responsesQueue.add(readHoldingRegistersResponse);
+             VehicleStatePLC vehicleStatePLC= interfaceMessageService.SendStateRequest();
+              if(vehicleStatePLC!=null)
+              responsesQueue.add(vehicleStatePLC);
              processindex++;
               break;
          case 1:
@@ -124,16 +107,9 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
            break;
 
            
-            }
-            }
-            catch (ModbusTransportException ex) {
-              
-              Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
             }    
           }    
     });
-     
-   
     getProcessModel().setVehicleState(Vehicle.State.IDLE);
     initialized = true;
   }
@@ -153,14 +129,11 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     if (isEnabled()) {
       return;
     }  
-   try {  
-     initplc();
-   }
-   catch (ModbusInitException ex) {
-     Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
-   }
+    interfaceMessageService.Init();
     try {
+      vehicleMessageSendTask=new VehicleMessageSendTask();
      vehicleActuralCyclicTask = new VehicleActuralTask();
+     new Thread(vehicleMessageSendTask,"messagesendtask").start();
     Thread acturalThread = new Thread(vehicleActuralCyclicTask, getName() + "-VechicleactrualThread");
     acturalThread.start();
    }
@@ -177,22 +150,14 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     if (Objects.equals(evt.getPropertyName(),
                  PLCProcessModel .Attribute.VEHICLE_SETPARAMETERS.name())) 
        {
-         
-      try {
-        VehicleParameterSetWithPLCMode vst= getProcessModel().getVehicleParameterSet();
-        if(!vst.isIswrite()) return;
-        VehicleParameterSetWithPLC vstp=new VehicleParameterSetWithPLC(vst.getHeartbeatsignal(),vst.getAgvvspeed(),
-                                                                       vst.getAgvaspeed(),vst.getRemotestart(),vst.getNavigationtask(),
-                                                                       vst.getNextsite(),vst.getNexttwosite(),vst.getTargetsitecardirection(),
-                                                                       vst.getTargetsite(),vst.getCurrentschedulingtask(),vst.getMaterialcode(),
-                                                                       vst.getChargingpilestate());
-        WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(5, 52, vstp.getdata());
-         master.send(writeRegistersRequest);
-         System.out.println("com.xintai.plc.comadpater.PLCComAdapter.propertyChange()"+vstp.toString());
-      }
-      catch (ModbusTransportException ex) {
-        Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
-      }
+         VehicleParameterSetWithPLCMode vst= getProcessModel().getVehicleParameterSet();
+         if(!vst.isIswrite()) return;
+         VehicleParameterSetWithPLC vstp=new VehicleParameterSetWithPLC(vst.getHeartbeatsignal(),vst.getAgvvspeed(),
+         vst.getAgvaspeed(),vst.getRemotestart(),vst.getNavigationtask(),
+         vst.getNextsite(),vst.getNexttwosite(),vst.getTargetsitecardirection(),
+         vst.getTargetsite(),vst.getCurrentschedulingtask(),vst.getMaterialcode(),
+         vst.getChargingpilestate());
+      interfaceMessageService.SendSettingTOPLC(vstp);   
        }
   }
  @Override
@@ -201,9 +166,11 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
       return;
     }
     super.disable();
-    master.destroy();
+   interfaceMessageService.DisConnect();
     vehicleActuralCyclicTask.terminate();
     vehicleActuralCyclicTask = null;
+    vehicleMessageSendTask.terminate();
+    vehicleMessageSendTask=null;
     stateRequesterTask.disable();
   }
 @Override
@@ -212,33 +179,30 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
       //eventBus.unsubscribe(this);
     initialized=false;
   }
-  
+  private  final Queue<MovementCommand> movementcomandbufferQueue = new LinkedBlockingQueue<>();
+    private Queue<MovementCommand> getMovementCommandsBufferQueue()
+    {
+    return  movementcomandbufferQueue;
+    }
    
   @Override
   public void sendCommand(MovementCommand cmd)
       throws IllegalArgumentException {
-       Object selectedItem = cmd.getStep().getDestinationPoint().getName();
-    String destinationIdString = selectedItem instanceof Point
-        ? ((Point) selectedItem).getName() : selectedItem.toString();
-    int destinationid=new  OpentcsPointToKeCongPoint(destinationIdString).getIntPoint(); 
-    System.out.println("com.xintai.vehicle.comadpter.KeCongCommAdapter.sendCommand()"+destinationid);
-    
-    try {
-      getProcessModel().setNextcurrentnavigationpoint(destinationid);
-      NavigateControl navigateControl =new NavigateControl().setCurrentstation(getProcessModel().getCurrentnavigationpoint())
-                                            .setNextstation(getProcessModel().getNextcurrentnavigationpoint())
-                                            .setOperation(0)
-                                            .setTargetstation(1);
-         System.out.println("com.xintai.plc.comadpater.PLCComAdapter.sendCommand()"+navigateControl.toString());
-          WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(5,60,navigateControl.encodedata());
-          WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
-          orderIds.put(cmd, destinationid);
-    }
-    catch (ModbusTransportException ex) {
-      Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
-    }
+    getMovementCommandsBufferQueue().add(cmd);
+    System.out.println(cmd.toString());
   }
-
+  //仅允许单步运行
+  @Override
+  protected  boolean  canSendNextCommand()
+  {
+  return super.canSendNextCommand()&!getProcessModel().isSingleStepModeEnabled();
+  }
+  @Override
+  public synchronized void clearCommandQueue() {
+    super.clearCommandQueue();
+    orderIds.clear();
+    getMovementCommandsBufferQueue().clear();
+  }
 @Override
   public synchronized ExplainedBoolean canProcess(List<String> operations) {
     requireNonNull(operations, "operations");
@@ -280,7 +244,18 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
   }
   @Override
   public void processMessage(Object message) {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+  if (message instanceof SetSpeedMultiplier) {
+      SetSpeedMultiplier lsMessage = (SetSpeedMultiplier) message;
+      int multiplier = lsMessage.getMultiplier();
+      // getProcessModel().setVehiclePaused(multiplier == 0);
+    }else if(message instanceof SetFinshMarkFromMes )
+    {
+      SetFinshMarkFromMes setfinshmarkfrommes=(SetFinshMarkFromMes)message;
+    String finshmark =  setfinshmarkfrommes.getFinshMark();
+    Boolean resultBoolean=Boolean.valueOf(finshmark).booleanValue();
+    getProcessModel().setFinshmarkfromes(resultBoolean);
+      System.out.println(resultBoolean.booleanValue());
+   }
   }
 
   @Override
@@ -296,7 +271,8 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
   @Override
   protected boolean isVehicleConnected() {
    //To change body of generated methods, choose Tools | Templates.
-  return  master.isConnected();
+  //return  master.isConnected();
+  return  true;
   }
       @Override
   public final PLCProcessModel getProcessModel() {
@@ -317,15 +293,15 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     FULL;
   }
   
-    private  final Queue<ReadHoldingRegistersResponse> responsesQueue = new LinkedBlockingQueue<>();
-    private Queue<ReadHoldingRegistersResponse> getComandVehicleStateResponsesQueue()
+    private  final Queue<VehicleStatePLC> responsesQueue = new LinkedBlockingQueue<>();
+    private Queue<VehicleStatePLC> getComandVehicleStateResponsesQueue()
     {
     return  responsesQueue;
     }
   
   private class VehicleActuralTask
       extends CyclicTask {
-  
+  private volatile boolean  lastmcdmark=false;
     private VehicleActuralTask() {
       super(0);
     }
@@ -333,24 +309,44 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     @Override
     protected void runActualTask()
     {
-    ReadHoldingRegistersResponse readHoldingRegistersResponse;
+    VehicleStatePLC vehicleStatePLC;
     synchronized(PLCComAdapter.this)
     {
-      readHoldingRegistersResponse= getComandVehicleStateResponsesQueue().poll();
+      vehicleStatePLC= getComandVehicleStateResponsesQueue().poll();
     }
-   if(readHoldingRegistersResponse!=null)
-    onStateResponse(readHoldingRegistersResponse);      
+   if(vehicleStatePLC!=null)
+    onStateResponse(vehicleStatePLC);      
     }
 
-    private void onStateResponse(ReadHoldingRegistersResponse readHoldingRegistersResponse ) {
-    byte[] data= readHoldingRegistersResponse.getData();
-    VehicleStatePLC vehiclestateplc=new VehicleStatePLC(data);
+    private void onStateResponse(VehicleStatePLC vehiclestateplc ) {
+   
    VehicleStateModel previousVehicleStateModel=getProcessModel().getPreviousVehicleStateModel();
      VehicleStateModel currentVehicleStateModel= vehiclestateplc.GetVehicleStateModel(); 
     getProcessModel().setPreviousVehicleStateModel(currentVehicleStateModel);
+    if(lastmcdmark)//如果执行到最后一步逻辑，则以下步骤不再执行。
+      return;
     updatepostion(currentVehicleStateModel,previousVehicleStateModel);
+    checkresponseisright(currentVehicleStateModel,previousVehicleStateModel);
     updatestate(currentVehicleStateModel, previousVehicleStateModel);
     updateorder(currentVehicleStateModel, previousVehicleStateModel);
+    }
+    private boolean checkresponseisright(VehicleStateModel curVehicleStateModel,VehicleStateModel previousStateModel)
+    { 
+      /*  if(curVehicleStateModel.getCurrentSite()==previousStateModel.getCurrentSite())
+      return false;*/
+    int next= curVehicleStateModel.getNextSite();
+    int nexttwo=curVehicleStateModel.getNextTwoSite();
+   int storenext= getProcessModel().getCurrentnavigationpoint();
+   int storenexttwo=getProcessModel().getNextcurrentnavigationpoint();
+    if(next==storenext&storenexttwo==nexttwo)
+    {
+      MovementCommand movementCommand= getMovementCommandsBufferQueue().poll();
+    if(movementCommand!=null)
+    { orderIds.putIfAbsent(movementCommand, nexttwo);
+    return true;
+    }
+    }
+    return false;
     }
     private void updatepostion(VehicleStateModel curVehicleStateModel,VehicleStateModel previousStateModel)
     {
@@ -378,6 +374,77 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
      return  Vehicle.State.UNAVAILABLE;
      }
     }
+     private void excutefinalaction(MovementCommand cmd)
+     {System.out.println("1");
+       if(cmd.isFinalMovement()&cmd.isWithoutOperation())
+       {
+      MovementCommand cmd1= getSentQueue().remove();
+      System.out.println("2");
+      if(cmd==cmd1)
+      {System.out.println("3");
+     System.out.println("com.xintai.plc.comadpater.PLCComAdapter.VehicleActuralTask.excutefinalaction()");
+     excuteActionAfterFinalOperation(cmd);
+     System.out.println("4");
+      }
+       }else if(!cmd.isWithoutOperation()&cmd.isFinalMovement())
+       {    
+     System.out.println("5");
+     getProcessModel().setSingleStepModeEnabled(true);
+     getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
+     Thread t=new Thread(new ExcuteFinalAction(cmd),"excutefinalaction");
+     t.start();
+     /*   try {
+     Thread.sleep(10000);
+     }
+     catch (InterruptedException ex) {
+     Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
+     }
+     System.out.println("send mark true");
+     getProcessModel().setFinshmarkfromes(true);*/
+     System.out.println("com.xintai.plc.comadpater.PLCComAdapter.VehicleActuralTask.excutefinalaction()");
+       }    
+     }
+     private void excuteActionAfterFinalOperation(MovementCommand cmd)
+     {
+     int orderId = orderIds.remove(cmd);
+     getProcessModel().commandExecuted(cmd);
+     getProcessModel().setSingleStepModeEnabled(false);
+     getProcessModel().setVehicleState(Vehicle.State.IDLE);
+     lastmcdmark=false;
+     }
+     private  class ExcuteFinalAction implements Runnable
+     {
+
+     private final MovementCommand cmd;
+
+     public ExcuteFinalAction(MovementCommand cmd)
+     {
+       this.cmd=cmd;
+     }
+
+     @Override
+     public void run() 
+     {
+       synchronized(getProcessModel().getObjectForMesFinshWork())
+       {  
+         while (!getProcessModel().isFinshmarkfromes()) 
+       {
+         try {
+           System.out.println("before");
+           getProcessModel().getObjectForMesFinshWork().wait();
+           excuteActionAfterFinalOperation(cmd);
+            System.out.println("after");
+         }
+         catch (InterruptedException ex) {
+           Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
+         }
+       }
+       }
+         System.out.println("end");
+       getProcessModel().setFinshmarkfromes(false);
+     }
+     
+     }
     private  void  updateorder(VehicleStateModel curVehicleStateModel,VehicleStateModel previousStateModel)
    {
      if(curVehicleStateModel.getCurrentSite()== 0) {
@@ -399,6 +466,12 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
      boolean finishedAll = false;
      while (!finishedAll && cmdIter.hasNext()) {
      MovementCommand cmd = cmdIter.next();
+     if( cmd.isFinalMovement()&("Point-"+String.format("%04d",curVehicleStateModel.getCurrentSite())) == null ? cmd.getFinalDestination().getName() == null : ("Point-"+String.format("%04d",curVehicleStateModel.getCurrentSite())).equals(cmd.getFinalDestination().getName()))
+     {
+     lastmcdmark=true;
+     excutefinalaction(cmd);
+     break;
+     }
      cmdIter.remove();
      int orderId = orderIds.remove(cmd);
      if (orderId == curVehicleStateModel.getCurrentSite()) {
@@ -410,4 +483,23 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     }
     
   }
+  
+  private  class VehicleMessageSendTask extends CyclicTask
+  {
+
+    public VehicleMessageSendTask() {
+      super(0);
+    }
+    
+    @Override
+    protected void runActualTask() {
+    //先不用加同步
+      MovementCommand movementCommand= getMovementCommandsBufferQueue().peek();
+      if(movementCommand!=null)
+      {
+      interfaceMessageService.SendNavigateComand(movementCommand,getProcessModel());
+      }
+    }
+  }
+     
 }
