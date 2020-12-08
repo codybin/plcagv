@@ -16,71 +16,82 @@ import com.xintai.data.util.DataConvertUtl;
  * @author Lenovo
  */
 public class NavigateControl {
-   private  int operation;
 
   @Override
   public String toString() {
-    return "NavigateControl{" + "operation=" + operation + ", targetstation=" + targetstation + ", byteQueue=" + byteQueue + ", currenttask=" + currenttask + ", currentstation=" + currentstation + ", nextstation=" + nextstation + '}';
+    return "NavigateControl{" + "remotestart=" + remotestart + ", navigationtask=" + navigationtask + ", nextsite=" + nextsite + ", nexttwosite=" + nexttwosite + ", targetsitecardirection=" + targetsitecardirection + ", targetsite=" + targetsite + '}';
   }
 
-  public int getOperation() {
-    return operation;
+ 
+
+  public int getRemotestart() {
+    return remotestart;
   }
 
-  public NavigateControl setOperation(int operation) {
-    this.operation = operation;
+  public NavigateControl setRemotestart(int remotestart) {
+    this.remotestart = remotestart;
     return  this;
   }
 
-  public int getTargetstation() {
-    return targetstation;
+  public int getNavigationtask() {
+    return navigationtask;
   }
 
-  public NavigateControl setTargetstation(int targetstation) {
-    this.targetstation = targetstation;
-        return  this;
+  public NavigateControl setNavigationtask(int navigationtask) {
+    this.navigationtask = navigationtask;
+    return  this;
   }
 
-
-  public int getCurrenttask() {
-    return currenttask;
+  public int getNextsite() {
+    return nextsite;
   }
 
-  public NavigateControl setCurrenttask(int currenttask) {
-    this.currenttask = currenttask;
-        return  this;
+  public NavigateControl setNextsite(int nextsite) {
+    this.nextsite = nextsite;
+    return  this;
   }
 
-  public int getCurrentstation() {
-    return currentstation;
+  public int getNexttwosite() {
+    return nexttwosite;
   }
 
-  public NavigateControl setCurrentstation(int currentstation) {
-    this.currentstation = currentstation;
-        return  this;
+  public NavigateControl setNexttwosite(int nexttwosite) {
+    this.nexttwosite = nexttwosite;
+    return  this;
   }
 
-  public int getNextstation() {
-    return nextstation;
+  public int getTargetsitecardirection() {
+    return targetsitecardirection;
   }
 
-  public NavigateControl setNextstation(int nextstation) {
-    this.nextstation = nextstation;
-        return  this;
+  public NavigateControl setTargetsitecardirection(int targetsitecardirection) {
+    this.targetsitecardirection = targetsitecardirection;
+    return  this;
   }
-   private int targetstation;
-   private  ByteQueue byteQueue;
-   private int  currenttask;
-   private int currentstation;
-   private int  nextstation;
+
+  public int getTargetsite() {
+    return targetsite;
+  }
+
+  public NavigateControl setTargetsite(int targetsite) {
+    this.targetsite = targetsite;
+    return  this;
+  }
+    private int remotestart;
+  private int navigationtask;
+  private int nextsite;
+  private int nexttwosite;
+  private int targetsitecardirection;
+  private int targetsite;
   public short [] encodedata()
   {
-     NumericLocator num=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,60,DataType.TWO_BYTE_INT_SIGNED);
-      short[]operationv= num.valueToShorts(operation);
-      short[]currenttaskv=num.valueToShorts(currenttask);
-      short[]currentstationv= num.valueToShorts(currentstation);
-      short[]nextstationv=num.valueToShorts(nextstation);
-      short[]targetstationv= num.valueToShorts(targetstation);
-       return DataConvertUtl.arrayCopy(operationv,currenttaskv,currentstationv,nextstationv,targetstationv);
+     NumericLocator num=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,62,DataType.TWO_BYTE_INT_SIGNED);
+ short[]numbers1= num.valueToShorts(remotestart);
+ short[]numbers2= num.valueToShorts(navigationtask);
+ short[]numbers3= num.valueToShorts(nextsite);
+ short[]numbers4= num.valueToShorts(nexttwosite);
+ short[]numbers5= num.valueToShorts(targetsitecardirection);
+ short[]numbers6= num.valueToShorts(targetsite);
+  return DataConvertUtl.arrayCopy(numbers1,numbers2,numbers3,numbers4,numbers5,numbers6);
   }
 }
