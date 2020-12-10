@@ -68,7 +68,7 @@ public class ChargerUtl {
      //chargerDevice_Interface.StopCharger();
    }
       System.out.println("com.xintai.charger.wrapper.ChargerUtl.StopCharge()+Í£Ö¹³É¹¦");
-   plcmode.setIscharging(4==chargerDevice_Interface.GetCurrentChargerTailState()[0]);
+   plcmode.setIscharging(!(4==chargerDevice_Interface.GetCurrentChargerTailState()[0]));
     }
     };
  call(callable); 
