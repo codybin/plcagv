@@ -8,8 +8,6 @@
 package org.opentcs.kernel.vehicles;
 
 import com.google.inject.assistedinject.Assisted;
-import com.xinta.plc.model.CancelTransportModel;
-import com.xintai.plc.comadpater.PLCProcessModel;
 import com.xintai.vehicle.comadpter.KeCongCommAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -297,7 +295,7 @@ if(commAdapter instanceof  KeCongCommAdapter)
     Vehicle currVehicleState = (Vehicle) objectEvent.getCurrentObjectState();
     if (prevVehicleState.getIntegrationLevel() != currVehicleState.getIntegrationLevel()) {
       onIntegrationLevelChange(prevVehicleState, currVehicleState);
-    }
+    }    
   }
 
   @Override
@@ -645,34 +643,8 @@ if(commAdapter instanceof  KeCongCommAdapter)
                                             propUpdate.getKey(),
                                             propUpdate.getValue());
       }
-    }
-    //添加以下逻辑,后续对不同的车辆添加不同模型。不想把服务所有的信息添加到单独类中。
-    if(evt.getSource() instanceof PLCProcessModel )
-    {
-      handlePlCProcessModelEvent(evt);
-    }
+    }  
   }
-  private void handlePlCProcessModelEvent(PropertyChangeEvent evt) {
-   
-    if (Objects.equals(evt.getPropertyName(),PLCProcessModel .Attribute.CancelTransport.name())) {
-              
-         PLCProcessModel pLCProcessModel=(PLCProcessModel)evt.getSource();
-         Vehicle currVehicle = vehicleService.fetchObject(Vehicle.class, vehicle.getReference()); //要获得最新消息，必须要用这个，否则获得的信息不是最新消息
-              // System.out.println(currVehicle.toString());
-             if(currVehicle.getTransportOrder()!=null)
-                  {  System.out.println(currVehicle.getTransportOrder().getName());
-                  if(!"".equals(currVehicle.getTransportOrder().getName()))
-                  {
-                  withdrawByVehicle(pLCProcessModel.getCancelTransportModel().isImmediate(),pLCProcessModel.getCancelTransportModel().isDisableVehicle());
-                  }
-                  }else
-                  {
-                     //停止车辆
-                  }
-                }
-    }
-  
-
   private void updateVehiclePrecisePosition(Triple precisePosition)
       throws ObjectUnknownException {
     // Get an up-to-date copy of the vehicle

@@ -23,12 +23,13 @@ dependencies {
   compile project(':openTCS-CommAdapter-Loopback')
   compile project(':openTCS-CommAdapter-PLC')
   compile project(':openTCS-CommAdapter-KeCong')
+  compile project(':openTCS-OtherDevice-Charger')
   compile project(':openTCS-Strategies-Default')
   compile project(':openTCS-Impl-Configuration-cfg4j')
   compile project(':openTCS-Kernel-Extension-HTTP-Services')
   compile project(':openTCS-Kernel-Extension-RMI-Services')
   compile project(':openTCS-Kernel-Extension-Statistics')
-   compile project(':openTCS-Kernel-Extension-Redis')
+ compile project(':openTCS-Kernel-Extension-Redis')
   compile group: 'de.huxhorn.sulky', name: 'de.huxhorn.sulky.ulid', version: '8.2.0'
   compileOnly group: 'de.huxhorn.sulky', name: 'de.huxhorn.sulky.ulid', version: '8.2.0', classifier: 'sources'
    compile group: 'commons-codec', name: 'commons-codec', version: '1.10'
