@@ -7,14 +7,13 @@ package com.xintai.plc.comadpater;
 
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
-import com.xinta.plc.model.CancelTransportModel;
 import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
+import com.xintai.charger.wrapper.ChargerUtl;
 import com.xintai.messageserviceinterface.InterfaceMessageService;
 import com.xintai.messageserviceinterface.MessageService;
 import com.xintai.plc.message.VehicleParameterSetWithPLC;
 import com.xintai.plc.message.VehicleStatePLC;
-import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.util.Iterator;
 import java.util.List;
@@ -28,9 +27,9 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
-import javax.swing.Action;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
+import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.Vehicle;
 
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
@@ -41,13 +40,14 @@ import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
 import org.opentcs.util.CyclicTask;
 import org.opentcs.util.ExplainedBoolean;
 import org.opentcs.util.event.EventBus;
+import org.opentcs.util.event.EventHandler;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Lenovo
  */
-public class PLCComAdapter  extends BasicVehicleCommAdapter {
+public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHandler{
  private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(PLCComAdapter.class);
   private final Vehicle vehicle;
   private final PLCAdapterComponentsFactory componentsFactory;
@@ -59,6 +59,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
  private  VehicleMessageSendTask vehicleMessageSendTask;
  private final  InterfaceMessageService interfaceMessageService;
    private final Map<MovementCommand, Integer> orderIds = new ConcurrentHashMap<>();
+ private ChargerUtl chargerUtl;
   
 @Inject
     public PLCComAdapter(@Assisted Vehicle vehicle,
@@ -90,16 +91,15 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
               if(vehicleStatePLC!=null)
               {
                // System.out.println(vehicleStatePLC.GetVehicleStateModel().getErrorErrorCode());
-                if(vehicleStatePLC.GetVehicleStateModel().getErrorErrorCode()==0)
+             //  if(vehicleStatePLC.GetVehicleStateModel().getErrorErrorCode()==0)
                 {
                   responsesQueue.add(vehicleStatePLC);
-                }else 
-                { 
-                  VehicleStateModel currentVehicleStateModel= vehicleStatePLC.GetVehicleStateModel(); 
-                    getProcessModel().setPreviousVehicleStateModel(currentVehicleStateModel);
-                   CancelTransportModel cancelTransportModel=new CancelTransportModel(true, false);
-                   getProcessModel().setCancelTransportModel(cancelTransportModel);
-                }
+              }/*else
+                {  VehicleStateModel currentVehicleStateModel= vehicleStatePLC.GetVehicleStateModel();
+                getProcessModel().setPreviousVehicleStateModel(currentVehicleStateModel);
+                getProcessModel().commandFailed(null);
+                getProcessModel().setVehicleState(Vehicle.State.ERROR);
+                }*/
               }
              processindex++;
               break;
@@ -123,8 +123,71 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
             }    
           }    
     });
+       eventBus.subscribe(this);
     getProcessModel().setVehicleState(Vehicle.State.IDLE);
     initialized = true;
+  }
+
+  @Override
+  public void onEvent(Object event) {
+       if (!(event instanceof TCSObjectEvent)) {
+      return;
+    }
+
+    TCSObjectEvent objectEvent = (TCSObjectEvent) event;
+    if (objectEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED) {
+      return;
+    }
+
+    if (!(objectEvent.getCurrentOrPreviousObjectState() instanceof Vehicle)) {
+      return;
+    }
+
+    if (!(Objects.equals(objectEvent.getCurrentOrPreviousObjectState().getName(),
+                         vehicle.getName()))) {
+      return;
+    }
+
+    Vehicle prevVehicleState = (Vehicle) objectEvent.getPreviousObjectState();
+    Vehicle currVehicleState = (Vehicle) objectEvent.getCurrentObjectState();
+        // Did the vehicle get a transport order?
+    if (currVehicleState.getTransportOrder() != null && prevVehicleState.getTransportOrder() == null) {
+   
+    }
+    // Did the vehicle finish a transport order?
+    if (currVehicleState.getTransportOrder() == null && prevVehicleState.getTransportOrder() != null) {
+
+    }
+    // Did the vehicle start charging?
+    if (currVehicleState.hasState(Vehicle.State.CHARGING)
+        && !prevVehicleState.hasState(Vehicle.State.CHARGING)) {
+      if(chargerUtl!=null)
+      chargerUtl.StartCharge();
+      System.out.println("plcadapter start charging");
+    }
+    // Did the vehicle start charging?
+    if (!currVehicleState.hasState(Vehicle.State.CHARGING)
+        && prevVehicleState.hasState(Vehicle.State.CHARGING)) {
+      if(chargerUtl!=null)
+        chargerUtl.StopCharge();
+      System.out.println("plcadapter end charging");
+    }
+    // If the vehicle is processing an order AND is not in state EXECUTING AND
+    // it was either EXECUTING before or not processing, yet, consider it being
+    // blocked.
+    if (currVehicleState.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
+        && !currVehicleState.hasState(Vehicle.State.EXECUTING)
+        && (prevVehicleState.hasState(Vehicle.State.EXECUTING)
+            || !prevVehicleState.hasProcState(Vehicle.ProcState.PROCESSING_ORDER))) {
+
+    }
+    // Is the vehicle processing an order AND has its state changed from
+    // something else to EXECUTING? - Consider it not blocked any more, then.
+    if (currVehicleState.hasProcState(Vehicle.ProcState.PROCESSING_ORDER)
+        && currVehicleState.hasState(Vehicle.State.EXECUTING)
+        && !prevVehicleState.hasState(Vehicle.State.EXECUTING)) {
+      
+    }
   }
   private void parsevehiclesetting(byte[] data)
   {
@@ -189,7 +252,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
 @Override
   public void terminate() {
       super.terminate();
-      //eventBus.unsubscribe(this);
+     eventBus.unsubscribe(this);
     initialized=false;
   }
   private  final Queue<MovementCommand> movementcomandbufferQueue = new LinkedBlockingQueue<>();
@@ -265,7 +328,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     {
       SetFinshMarkFromMes setfinshmarkfrommes=(SetFinshMarkFromMes)message;
     String finshmark =  setfinshmarkfrommes.getFinshMark();
-    Boolean resultBoolean=Boolean.valueOf(finshmark).booleanValue();
+    Boolean resultBoolean=Boolean.valueOf(finshmark);
     getProcessModel().setFinshmarkfromes(resultBoolean);
       System.out.println(resultBoolean.booleanValue());
    }
@@ -336,10 +399,10 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
    VehicleStateModel previousVehicleStateModel=getProcessModel().getPreviousVehicleStateModel();
      VehicleStateModel currentVehicleStateModel= vehiclestateplc.GetVehicleStateModel(); 
     getProcessModel().setPreviousVehicleStateModel(currentVehicleStateModel);
-    if(lastmcdmark)//如果执行到最后一步逻辑，则以下步骤不再执行。
-      return;
     updatepostion(currentVehicleStateModel,previousVehicleStateModel);
     checkresponseisright(currentVehicleStateModel,previousVehicleStateModel);
+   if(lastmcdmark)//如果执行到最后一步逻辑，则以下步骤不再执行。
+      return;
     updatestate(currentVehicleStateModel, previousVehicleStateModel);
     updateorder(currentVehicleStateModel, previousVehicleStateModel);
     }
@@ -356,7 +419,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
       MovementCommand movementCommand= getMovementCommandsBufferQueue().poll();
     if(movementCommand!=null)
     { orderIds.putIfAbsent(movementCommand, nexttwo);
-    return true;
+     return true;
     }
     }
     return false;
@@ -369,20 +432,24 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     }
     private  void  updatestate(VehicleStateModel curVehicleStateModel,VehicleStateModel previousStateModel)
    {
-     if(curVehicleStateModel.getNavigationalState()==previousStateModel.getNavigationalState())
-     return;
-      getProcessModel().setVehicleState(translateState(curVehicleStateModel.getNavigationalState()));
+     /* if(curVehicleStateModel.getNavigationalState()==previousStateModel.getNavigationalState())
+     return;*/
+    if(getProcessModel().getVehicleState()!=Vehicle.State.CHARGING)
+        getProcessModel().setVehicleState(translateState(curVehicleStateModel.getNavigationalState()));
      }
      private Vehicle.State  translateState(int data)
      {
      switch(data)
      {
      case 1:
+     case 4:
      return Vehicle.State.IDLE;
      case 2:
-     return Vehicle.State.EXECUTING;
      case 3:
-     return Vehicle.State.CHARGING;
+     return Vehicle.State.EXECUTING;
+     case 5:
+       getProcessModel().commandFailed(null);//失效订单
+     return Vehicle.State.ERROR;
      default:
      return  Vehicle.State.UNAVAILABLE;
      }
@@ -398,7 +465,16 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
      System.out.println("4");   
        }else if(!cmd.isWithoutOperation()&cmd.isFinalMovement())
        {    
-     System.out.println("5");
+      System.out.println("5");
+      if(cmd.getOperation().equals(getRechargeOperation()))
+      {
+        System.out.println("before set state to charging");
+        chargerUtl=new ChargerUtl(3, "COM6", getProcessModel());
+         getProcessModel().setVehicleState(Vehicle.State.CHARGING);
+          excuteActionAfterFinalOperation(cmd);
+         System.out.println("end set state to charging");
+        return;
+      }
      getProcessModel().setSingleStepModeEnabled(true);
      getProcessModel().setVehicleState(Vehicle.State.EXECUTING);
      Thread t=new Thread(new ExcuteFinalAction(cmd),"excutefinalaction");
@@ -407,7 +483,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
      }
      private void excuteActionAfterFinalOperation(MovementCommand cmd)
      {
-        if(cmd!= getSentQueue().peek())
+     if(cmd!= getSentQueue().peek())
        {
        return;
        }
@@ -415,7 +491,8 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
      orderIds.remove(cmd);
      getProcessModel().commandExecuted(cmd);
      getProcessModel().setSingleStepModeEnabled(false);
-     getProcessModel().setVehicleState(Vehicle.State.IDLE);
+     if( getProcessModel().getVehicleState()!=Vehicle.State.CHARGING)
+       getProcessModel().setVehicleState(Vehicle.State.IDLE);
      getProcessModel().setCurrentnavigationpoint(0);
      getProcessModel().setNextcurrentnavigationpoint(0);
      lastmcdmark=false;
@@ -502,11 +579,19 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter {
     @Override
     protected void runActualTask() {
     //先不用加同步
+    
       MovementCommand movementCommand= getMovementCommandsBufferQueue().peek();
       if(movementCommand!=null)
-      {
+      { if(getProcessModel().isIscharging())
+      {       
+      getProcessModel().setVehicleState(Vehicle.State.EXECUTING);//充电逻辑需要这边置置位状态为运行状态，否则充电状态无法取消。
+      return;
+      }
         if(getProcessModel().getPreviousVehicleStateModel().getAgvRunState()==2)
+        { 
       interfaceMessageService.SendNavigateComand(movementCommand,getProcessModel());
+        }
+        
       }
     }
   }
