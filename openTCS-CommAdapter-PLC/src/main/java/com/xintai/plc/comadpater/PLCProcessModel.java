@@ -5,7 +5,6 @@
  */
 package com.xintai.plc.comadpater;
 
-import com.xinta.plc.model.CancelTransportModel;
 import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
 import static java.util.Objects.requireNonNull;
@@ -19,22 +18,16 @@ import static org.opentcs.util.Assertions.checkInRange;
  * @author Lenovo
  */
 public class PLCProcessModel extends VehicleProcessModel  {
- 
- private CancelTransportModel cancelTransportModel;
+ private volatile boolean  ischarging=false;
 
-  public synchronized CancelTransportModel getCancelTransportModel() {
-    return cancelTransportModel;
+  public boolean isIscharging() {
+    return ischarging;
   }
 
-  public void setCancelTransportModel(CancelTransportModel cancelTransportModel) {
-    CancelTransportModel oldValue = this.cancelTransportModel;
-     this.cancelTransportModel = cancelTransportModel;
-
-    getPropertyChangeSupport().firePropertyChange(Attribute.CancelTransport.name(),
-                                                  oldValue,
-                                                  cancelTransportModel);
+  public void setIscharging(boolean ischarging) {
+    this.ischarging = ischarging;
   }
- 
+  
   private final Object object=new Object();
 
   public Object getObjectForMesFinshWork() {
@@ -163,8 +156,8 @@ public class PLCProcessModel extends VehicleProcessModel  {
   }
 
   /**
-   * Sets the TCP port number the vehicle is listening on.
-   *设置车辆正在监听的端口号码
+   * Sets the TCP port number the vehicle is listening on.设置车辆正在监听的端口号码
+   * @param vehicleset
    * @param vehiclePort The TCP port number.
    */
   public synchronized void setVehicleParameterSet(VehicleParameterSetWithPLCMode vehicleset) {
@@ -180,6 +173,5 @@ public class PLCProcessModel extends VehicleProcessModel  {
     VEHILCE_STATE,
     VEHICLE_SETPARAMETERS,
     SINGLE_STEP_MODE,
-    CancelTransport
       }
 }
