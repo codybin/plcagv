@@ -10,8 +10,9 @@ import com.google.inject.assistedinject.Assisted;
 import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
 import com.xintai.charger.wrapper.ChargerUtl;
+import com.xintai.messageserviceinterface.IPParameter;
 import com.xintai.messageserviceinterface.InterfaceMessageService;
-import com.xintai.messageserviceinterface.MessageService;
+import com.xintai.messageserviceinterface.VehicleMessageService;
 import com.xintai.plc.message.VehicleParameterSetWithPLC;
 import com.xintai.plc.message.VehicleStatePLC;
 import java.beans.PropertyChangeEvent;
@@ -27,6 +28,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
+import jdk.nashorn.internal.parser.TokenType;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObjectEvent;
@@ -34,6 +36,7 @@ import org.opentcs.data.model.Vehicle;
 
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.MovementCommand;
+import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.drivers.vehicle.messages.SetFinshMarkFromMes;
 import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
@@ -57,7 +60,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
   private StateRequesterTask stateRequesterTask;
   private VehicleActuralTask vehicleActuralCyclicTask;
  private  VehicleMessageSendTask vehicleMessageSendTask;
- private final  InterfaceMessageService interfaceMessageService;
+ private final   InterfaceMessageService interfaceMessageService;
    private final Map<MovementCommand, Integer> orderIds = new ConcurrentHashMap<>();
  private ChargerUtl chargerUtl;
   
@@ -71,7 +74,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     this.componentsFactory = requireNonNull( componentsFactory, "componentsFactory");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.eventBus = requireNonNull(eventBus, "eventBus");
-    interfaceMessageService=new MessageService("127.0.0.1",502);
+     interfaceMessageService=new VehicleMessageService();
   }
   
     private int processindex=0;
@@ -82,46 +85,30 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     }
     super.initialize();
      this.stateRequesterTask = componentsFactory.createStateRequesterTask(e -> {
-         // if(master.isConnected())
-          {
+       boolean isconnect=false;
             switch(processindex)
          {  
               case 0:
-             VehicleStatePLC vehicleStatePLC= interfaceMessageService.SendStateRequest();
+           VehicleStatePLC vehicleStatePLC= interfaceMessageService.SendStateRequest();
               if(vehicleStatePLC!=null)
-              {
-               // System.out.println(vehicleStatePLC.GetVehicleStateModel().getErrorErrorCode());
-             //  if(vehicleStatePLC.GetVehicleStateModel().getErrorErrorCode()==0)
-                {
+              {   isconnect=true;
                   responsesQueue.add(vehicleStatePLC);
-              }/*else
-                {  VehicleStateModel currentVehicleStateModel= vehicleStatePLC.GetVehicleStateModel();
-                getProcessModel().setPreviousVehicleStateModel(currentVehicleStateModel);
-                getProcessModel().commandFailed(null);
-                getProcessModel().setVehicleState(Vehicle.State.ERROR);
-                }*/
               }
              processindex++;
               break;
          case 1:
-           /*  ReadHoldingRegistersRequest vst=new ReadHoldingRegistersRequest(5,52,10);
-           ReadHoldingRegistersResponse rvst=(ReadHoldingRegistersResponse) master.send(vst);
-           parsevehiclesetting(rvst.getData());
-           */
-           /*  PLCProcessModelTO processModel=new PLCProcessModelTO();
-           VehicleParameterSetWithPLCMode vps =processModel.getVehicleParameterSet();
-           VehicleParameterSetWithPLC vpswplc= new  VehicleParameterSetWithPLC(vps.getAutorun(), vps.getVspeed(), vps.getAspeed());
-           byte[]data= vpswplc.getdata();
-           
-           
-           //1.读取设置变量的信息
-           parsevehiclesetting(data);*/
+           isconnect=interfaceMessageService.HeartBeat();
            processindex=0;
-           break;
-
-           
-            }    
-          }    
+           break;           
+            } 
+            getProcessModel().setCommAdapterConnected(isconnect);
+            
+    if(!getProcessModel().isCommAdapterConnected())
+    {  
+        interfaceMessageService.DisConnect();
+        interfaceMessageService.Init(new IPParameter(getProcessModel().getVehicleHost(), getProcessModel().getVehiclePort(),getProcessModel().getSlaveid()));
+    }
+  //  System.out.println("com.xintai.plc.comadpater.PLCComAdapter.propertyChange()");
     });
        eventBus.subscribe(this);
     getProcessModel().setVehicleState(Vehicle.State.IDLE);
@@ -189,12 +176,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
       
     }
   }
-  private void parsevehiclesetting(byte[] data)
-  {
-    /*VehicleParameterSetWithPLC v=new VehicleParameterSetWithPLC();
-    VehicleParameterSetWithPLCMode vp=v.decode(data);
-    getProcessModel().setVehicleParameterSet(vp);*/
-  }
+ 
     @Override
   public boolean isInitialized() {
     return initialized;
@@ -205,11 +187,20 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     if (isEnabled()) {
       return;
     }  
-    interfaceMessageService.Init();
+    if(!interfaceMessageService.Init(new IPParameter(getProcessModel().getVehicleHost(), getProcessModel().getVehiclePort(),getProcessModel().getSlaveid()) ))
+    {
+      LOG.info("叉车没有连接");
+      getProcessModel().setCommAdapterConnected(false);
+    return;
+    }else
+    {
+     LOG.info("叉车连接上");
+      getProcessModel().setCommAdapterConnected(true);
+    }
     try {
       vehicleMessageSendTask=new VehicleMessageSendTask();
      vehicleActuralCyclicTask = new VehicleActuralTask();
-     new Thread(vehicleMessageSendTask,"messagesendtask").start();
+    new Thread(vehicleMessageSendTask,"messagesendtask").start();
     Thread acturalThread = new Thread(vehicleActuralCyclicTask, getName() + "-VechicleactrualThread");
     acturalThread.start();
    }
@@ -262,7 +253,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     }
    
   @Override
-  public void sendCommand(MovementCommand cmd)
+  public synchronized void sendCommand(MovementCommand cmd)
       throws IllegalArgumentException {
     getMovementCommandsBufferQueue().add(cmd);
     System.out.println(cmd.toString());
@@ -379,7 +370,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
       extends CyclicTask {
   private volatile boolean  lastmcdmark=false;
     private VehicleActuralTask() {
-      super(0);
+      super(100);
     }
 
     @Override
@@ -573,13 +564,20 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
   {
 
     public VehicleMessageSendTask() {
-      super(0);
+      super(200);
     }
     
     @Override
-    protected void runActualTask() {
-    //先不用加同步
-    
+    protected  void runActualTask() {
+     while(getMovementCommandsBufferQueue().isEmpty())
+    {
+       try {
+         Thread.sleep(100);
+       }
+       catch (InterruptedException ex) {
+         Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
+       }
+    }
       MovementCommand movementCommand= getMovementCommandsBufferQueue().peek();
       if(movementCommand!=null)
       { if(getProcessModel().isIscharging())
