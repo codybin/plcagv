@@ -137,7 +137,15 @@ public class PLCProcessModel extends VehicleProcessModel  {
      public synchronized int getVehiclePort() {
     return vehiclePort;
   }
+private  int slaveid;
 
+  public int getSlaveid() {
+    return slaveid;
+  }
+
+  public void setSlaveid(int slaveid) {
+    this.slaveid = slaveid;
+  }
   /**
    * Sets the TCP port number the vehicle is listening on.
    *设置车辆正在监听的端口号码

@@ -12,6 +12,7 @@ package com.xintai.plc.comadpater;
 
 import static com.xintai.plc.comadpater.VehicleProperties.PROPKEY_VEHICLE_HOST;
 import static com.xintai.plc.comadpater.VehicleProperties.PROPKEY_VEHICLE_PORT;
+import static com.xintai.plc.comadpater.VehicleProperties.SLAVE_ID;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
 import org.opentcs.data.model.Vehicle;
@@ -84,7 +85,6 @@ public class PLCCommAdapterFactory
     if (vehicle.getProperty(PROPKEY_VEHICLE_HOST) == null) {
     return false;
     }
-    
     if (vehicle.getProperty(VehicleProperties.PROPKEY_VEHICLE_PORT) == null) {
     return false;
     }
@@ -92,6 +92,9 @@ public class PLCCommAdapterFactory
     checkInRange(Integer.parseInt(vehicle.getProperty(PROPKEY_VEHICLE_PORT)),
     1024,
     65535);
+     checkInRange(Integer.parseInt(vehicle.getProperty(SLAVE_ID)),
+    0,
+    125);
     }
     catch (IllegalArgumentException exc) {
     return false;
@@ -110,8 +113,10 @@ public class PLCCommAdapterFactory
    PLCComAdapter adapter = componentsFactory.createExampleCommAdapter(vehicle);
     //获得车的属性可以在此点获取
     adapter.getProcessModel().setVehicleHost(vehicle.getProperty(PROPKEY_VEHICLE_HOST));
+    adapter.getProcessModel().setSlaveid( Integer.parseInt(vehicle.getProperty(SLAVE_ID)));
     adapter.getProcessModel().setVehiclePort(
         Integer.parseInt(vehicle.getProperty(PROPKEY_VEHICLE_PORT))
+        
     );
     return adapter;
   }

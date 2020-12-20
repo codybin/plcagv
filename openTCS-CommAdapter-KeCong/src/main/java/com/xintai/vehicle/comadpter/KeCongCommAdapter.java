@@ -565,24 +565,6 @@ private  RobotStatuResponseModel keResponseModel;
         }
     }
   
-   private void onStateResponse(NavigateStatuResponseModel stateResponse) {
-    requireNonNull(stateResponse, "stateResponse");
-
-    final NavigateStatuResponseModel previousState = getProcessModel().getCurrentStateModel();
-    final NavigateStatuResponseModel currentState = stateResponse;
-
-    kernelExecutor.submit(() -> {
-      // Update the vehicle's current state and remember the old one.
-      getProcessModel().setPreviesStatuResponseModel(previousState);
-      getProcessModel().setCurrentStateModel(currentState);
-      checkForVehiclePositionUpdate(previousState, currentState);
-      checkForVehicleStateUpdate(previousState, currentState);
-      checkOrderFinished(previousState, currentState);
-    
-      // XXX Process further state updates extracted from the telegram here.
-    });
-  }
- 
  private void onStateResponse(  KeCongComandNavigateSearchResponse  kccnsr) {
     requireNonNull(kccnsr, "stateResponse");
 
@@ -795,12 +777,9 @@ while(getProcessModel().isIscharging())
    //   stateRequesterTask.restart();
   }
   }
-  private float liftfork=0;
-  private volatile boolean  lift=false;
  private TruckData  truckData;
   private void liftorlowerfork(float f)
   {
-    liftfork=f;
    getProcessModel().setIsLift(true);
     truckData=new TruckData();
     truckData.setEnbalepid((byte)1);

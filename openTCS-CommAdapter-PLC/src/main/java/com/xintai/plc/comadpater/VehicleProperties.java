@@ -16,6 +16,8 @@ public interface VehicleProperties {
    * The key of the vehicle property containing the vehicle's host name/IP address.
    */
   String PROPKEY_VEHICLE_HOST = "example:vehicleHost";
+  
+  String SLAVE_ID="slaveid";
   /**
    * The key of the vehicle property containing the vehicle's TCP port.
    */
