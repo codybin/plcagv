@@ -18,7 +18,9 @@ public interface InterfaceMessageService {
   public void SendNavigateComand(MovementCommand movementCommand,VehicleProcessModel pLCProcessModel);
   public  VehicleStatePLC SendStateRequest();
   public void SendSettingTOPLC(VehicleParameterSetWithPLC  vehicleParameterSetWithPLC);
-  public boolean  Init();
+  public boolean  IsInitial();
+  public boolean  Init(IPParameter iPParameter);
   public boolean Connect();
-  public boolean DisConnect();    
+  public boolean DisConnect(); 
+  public boolean  HeartBeat();
 }
