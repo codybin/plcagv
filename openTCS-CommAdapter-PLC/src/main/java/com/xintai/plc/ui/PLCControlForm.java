@@ -304,8 +304,16 @@ private static final Logger LOG = LoggerFactory.getLogger(PLCControlForm.class);
     }  else if (Objects.equals(attributeChanged,
                             VehicleProcessModel.Attribute.POSITION.name())) {
     //  updatePosition(processModel.getVehiclePosition());
+    }else if (Objects.equals(attributeChanged,
+                       VehicleProcessModel.Attribute.COMM_ADAPTER_CONNECTED.name())) {
+         updateCommAdapterConnected(processModel.isCommAdapterConnected());  
     }
    
+  }
+      private void updateCommAdapterConnected(boolean connected) {
+          SwingUtilities.invokeLater(() -> {
+         isconnect.setSelected(connected);
+          });
   }
    private void updateVehicleHost(String host) {
     SwingUtilities.invokeLater(() -> IPTXT.setText(host));
