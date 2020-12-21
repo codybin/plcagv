@@ -60,7 +60,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
   private StateRequesterTask stateRequesterTask;
   private VehicleActuralTask vehicleActuralCyclicTask;
  private  VehicleMessageSendTask vehicleMessageSendTask;
- private final   InterfaceMessageService interfaceMessageService;
+ private final   InterfaceMessageService IVehicleMessageService;
    private final Map<MovementCommand, Integer> orderIds = new ConcurrentHashMap<>();
  private ChargerUtl chargerUtl;
   
@@ -74,7 +74,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     this.componentsFactory = requireNonNull( componentsFactory, "componentsFactory");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.eventBus = requireNonNull(eventBus, "eventBus");
-     interfaceMessageService=new VehicleMessageService();
+     IVehicleMessageService=new VehicleMessageService();
   }
   
     private int processindex=0;
@@ -85,28 +85,26 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     }
     super.initialize();
      this.stateRequesterTask = componentsFactory.createStateRequesterTask(e -> {
-       boolean isconnect=false;
             switch(processindex)
          {  
               case 0:
-           VehicleStatePLC vehicleStatePLC= interfaceMessageService.SendStateRequest();
+           VehicleStatePLC vehicleStatePLC= IVehicleMessageService.SendStateRequest();
               if(vehicleStatePLC!=null)
-              {   isconnect=true;
+              {   
                   responsesQueue.add(vehicleStatePLC);
               }
              processindex++;
               break;
          case 1:
-           isconnect=interfaceMessageService.HeartBeat();
+           IVehicleMessageService.HeartBeat();
            processindex=0;
            break;           
-            } 
-            getProcessModel().setCommAdapterConnected(isconnect);
-            
+            }   
     if(!getProcessModel().isCommAdapterConnected())
     {  
-        interfaceMessageService.DisConnect();
-        interfaceMessageService.Init(new IPParameter(getProcessModel().getVehicleHost(), getProcessModel().getVehiclePort(),getProcessModel().getSlaveid()));
+        IVehicleMessageService.DisConnect();
+        IVehicleMessageService.Init(new IPParameter(getProcessModel().getVehicleHost(), getProcessModel().getVehiclePort(),getProcessModel().getSlaveid()));
+       LOG.info("正在重连叉车");
     }
   //  System.out.println("com.xintai.plc.comadpater.PLCComAdapter.propertyChange()");
     });
@@ -186,8 +184,13 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
   public synchronized void enable() {
     if (isEnabled()) {
       return;
-    }  
-    if(!interfaceMessageService.Init(new IPParameter(getProcessModel().getVehicleHost(), getProcessModel().getVehiclePort(),getProcessModel().getSlaveid()) ))
+    }
+    IVehicleMessageService.SetConnectEvent(()->{getProcessModel().setCommAdapterConnected(IVehicleMessageService.IsConnected());
+      System.out.println("com.xintai.plc.comadpater.PLCComAdapter.enable()+connect");});
+    IVehicleMessageService.SetDisConnectEvent(()->{getProcessModel().setCommAdapterConnected(IVehicleMessageService.IsConnected());
+      System.out.println("com.xintai.plc.comadpater.PLCComAdapter.enable()+disconnect");});
+    IVehicleMessageService.Init(new IPParameter(getProcessModel().getVehicleHost(), getProcessModel().getVehiclePort(),getProcessModel().getSlaveid()) );
+    if(!IVehicleMessageService.IsConnected())
     {
       LOG.info("叉车没有连接");
       getProcessModel().setCommAdapterConnected(false);
@@ -224,7 +227,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
          vst.getNextsite(),vst.getNexttwosite(),vst.getTargetsitecardirection(),
          vst.getTargetsite(),vst.getCurrentschedulingtask(),vst.getMaterialcode(),
          vst.getChargingpilestate());
-      interfaceMessageService.SendSettingTOPLC(vstp);   
+      IVehicleMessageService.SendSettingTOPLC(vstp);   
        }
   }
  @Override
@@ -233,7 +236,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
       return;
     }
     super.disable();
-   interfaceMessageService.DisConnect();
+   IVehicleMessageService.DisConnect();
     vehicleActuralCyclicTask.terminate();
     vehicleActuralCyclicTask = null;
     vehicleMessageSendTask.terminate();
@@ -587,7 +590,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
       }
         if(getProcessModel().getPreviousVehicleStateModel().getAgvRunState()==2)
         { 
-      interfaceMessageService.SendNavigateComand(movementCommand,getProcessModel());
+      IVehicleMessageService.SendNavigateComand(movementCommand,getProcessModel());
         }
         
       }

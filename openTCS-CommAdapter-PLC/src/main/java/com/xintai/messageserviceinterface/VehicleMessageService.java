@@ -20,6 +20,7 @@ import com.xintai.plc.comadpater.PLCProcessModel;
 import com.xintai.plc.message.NavigateControl;
 import com.xintai.plc.message.VehicleParameterSetWithPLC;
 import com.xintai.plc.message.VehicleStatePLC;
+import java.awt.event.ActionListener;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentcs.data.model.Point;
@@ -39,6 +40,7 @@ public class VehicleMessageService implements InterfaceMessageService{
     //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
  if(!(ProcessModel instanceof  PLCProcessModel))
  return;
+   boolean result=false;
   PLCProcessModel PLCProcessModel=  (PLCProcessModel) ProcessModel;
        Object selectedItem = movementCommand.getStep().getDestinationPoint().getName();
     String destinationIdString = selectedItem instanceof Point
@@ -58,11 +60,14 @@ public class VehicleMessageService implements InterfaceMessageService{
          System.out.println("com.xintai.plc.comadpater.PLCComAdapter.sendCommand()"+navigateControl.toString());
           WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,1999+59,navigateControl.encodedata());
           WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
+          result=true;
        //   orderIds.put(cmd, destinationid);
     }
     catch (ModbusTransportException ex) {
+      result=false;
       Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
     } 
+   setConnected(result);
   }
 
   @Override
@@ -82,20 +87,22 @@ public class VehicleMessageService implements InterfaceMessageService{
      Logger.getLogger(VehicleMessageService.class.getName()).log(Level.SEVERE, null, ex);
      vehicleStatePLC=null;
    }
+   setConnected(vehicleStatePLC!=null); 
     return  vehicleStatePLC;
   }
 
   @Override
   public boolean Init(IPParameter iPParameter) {
-  boolean resut=false;
+        boolean resut=false;
         IpParameters ipParameters = new IpParameters();
         ipParameters.setHost(iPParameter.getIp());//后续可以用getprocemodle传进来
         ipParameters.setPort(iPParameter.getPort());
         slaveid=iPParameter.getSlaveid();
         ipParameters.setEncapsulated(false);
         try { 
-          ModbusFactory modbusFactory = new ModbusFactory();
-        master = modbusFactory.createTcpMaster(ipParameters, true);
+        ModbusFactory modbusFactory = new ModbusFactory();
+       if(master==null)
+           master = modbusFactory.createTcpMaster(ipParameters, true);
         master.setTimeout(3000);
         master.setRetries(2);
         master.init();
@@ -103,9 +110,9 @@ public class VehicleMessageService implements InterfaceMessageService{
           System.out.println("com.xintai.messageserviceinterface.VehicleMessageService.Init()"+master.isInitialized());
     }
     catch (ModbusInitException ex) {
-      resut=false;
+     resut=false;
     }
-       
+       setConnected(resut); 
       return  resut;
     
   }
@@ -127,11 +134,46 @@ public class VehicleMessageService implements InterfaceMessageService{
    try {
      WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,1999+52, vehicleParameterSetWithPLC.getdata());
      master.send(writeRegistersRequest);
+     setConnected(true); 
      System.out.println("com.xintai.plc.comadpater.PLCComAdapter.propertyChange()"+vehicleParameterSetWithPLC.toString());
    }
    catch (ModbusTransportException ex) {
+       setConnected(false); 
      Logger.getLogger(VehicleMessageService.class.getName()).log(Level.SEVERE, null, ex);
    }
+  }
+
+ 
+  private void OnConnect() {
+   ConnectListenner.Action();
+  }
+
+
+  private void OnDisConnect() {
+   disCConnectListenner.Action();
+  }
+private  PLCConnectListenner disCConnectListenner;
+  @Override
+  public void SetDisConnectEvent(PLCConnectListenner pLCConnectListenner) {
+  disCConnectListenner=pLCConnectListenner;
+  }
+private  PLCConnectListenner ConnectListenner;
+  @Override
+  public void SetConnectEvent(PLCConnectListenner plccl) {
+   ConnectListenner=plccl;
+  }
+
+
+  private void setConnected(boolean  isconnect)
+  {
+    if(isconnect!=master.isConnected())
+    {
+      master.setConnected(isconnect);
+      if(!master.isConnected())
+       OnDisConnect();
+      else
+       OnConnect();
+    }
   }
 
 private int slaveid;
@@ -147,11 +189,17 @@ private int slaveid;
  
      Logger.getLogger(VehicleMessageService.class.getName()).log(Level.SEVERE, null, ex);
    }
+    setConnected(result); 
    return result;
   }
 
   @Override
   public boolean IsInitial() {
  return master.isInitialized();
+  }
+
+  @Override
+  public boolean IsConnected() {
+   return  master.isConnected();
   }
 }

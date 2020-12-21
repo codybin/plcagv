@@ -7,6 +7,7 @@ package com.xintai.messageserviceinterface;
 
 import com.xintai.plc.message.VehicleParameterSetWithPLC;
 import com.xintai.plc.message.VehicleStatePLC;
+import java.awt.event.ActionListener;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 
@@ -23,4 +24,7 @@ public interface InterfaceMessageService {
   public boolean Connect();
   public boolean DisConnect(); 
   public boolean  HeartBeat();
+  public boolean  IsConnected();
+  public void SetDisConnectEvent(PLCConnectListenner pLCConnectListenner);
+  public void SetConnectEvent(PLCConnectListenner plccl);
 }
