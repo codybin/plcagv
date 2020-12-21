@@ -28,7 +28,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.Nonnull;
-import jdk.nashorn.internal.parser.TokenType;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObjectEvent;
@@ -36,7 +35,6 @@ import org.opentcs.data.model.Vehicle;
 
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.MovementCommand;
-import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
 import org.opentcs.drivers.vehicle.messages.SetFinshMarkFromMes;
 import org.opentcs.drivers.vehicle.messages.SetSpeedMultiplier;
@@ -68,13 +66,14 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     public PLCComAdapter(@Assisted Vehicle vehicle,
                             PLCAdapterComponentsFactory componentsFactory,
                             @KernelExecutor ExecutorService kernelExecutor,
-                             @Nonnull @ApplicationEventBus EventBus eventBus) {
+                             @Nonnull @ApplicationEventBus EventBus eventBus,
+                           VehicleMessageService vehicleMessageService  ) {
     super(new PLCProcessModel(vehicle), 3, 2, LoadAction.CHARGE, kernelExecutor);
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.componentsFactory = requireNonNull( componentsFactory, "componentsFactory");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.eventBus = requireNonNull(eventBus, "eventBus");
-     IVehicleMessageService=new VehicleMessageService();
+     IVehicleMessageService= requireNonNull(vehicleMessageService, "vehicleMessageService");
   }
   
     private int processindex=0;

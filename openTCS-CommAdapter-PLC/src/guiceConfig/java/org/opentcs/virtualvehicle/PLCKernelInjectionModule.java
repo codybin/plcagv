@@ -31,7 +31,8 @@ PLCCommAdapterConfiguration configuration
     LOG.info("Example communication adapter disabled by configuration.");
     return;
     }
-    
+     bind(PLCCommAdapterConfiguration.class)
+        .toInstance(configuration);
     install(new FactoryModuleBuilder().build(PLCAdapterComponentsFactory.class));
     vehicleCommAdaptersBinder().addBinding().to(PLCCommAdapterFactory.class);
   }

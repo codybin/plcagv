@@ -29,5 +29,30 @@ public interface PLCCommAdapterConfiguration {
       orderKey = "0_enable")
   boolean enable();
 
+  @ConfigurationEntry(
+      type = "Integer",
+      description = "StateOffSetAddr",
+      orderKey = "1")
+  int stateoffset();
+    @ConfigurationEntry(
+      type = "Integer",
+      description = "StateLength",
+      orderKey = "2")
+  int statelength();
+   @ConfigurationEntry(
+      type = "Integer",
+      description = "NavigateOffSet",
+      orderKey = "3")
+  int navigateoffset();
+    @ConfigurationEntry(
+      type = "Integer",
+      description = "SettingVarOffset",
+      orderKey = "4")
+  int settingoffset();
+     @ConfigurationEntry(
+      type = "Integer",
+      description = "HeartBeatOffset",
+      orderKey = "5")
+  int heartbeat();
 }
 

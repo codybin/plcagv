@@ -621,7 +621,7 @@ public class OpenTCSView
 
   /**
    * Adds a new transport order view.
-   * 增加一个新的运输订单
+   * 增加一个新的运输订单视图
    */
   public void addTransportOrderView() {
     int biggestIndex = viewManager.getNextTransportOrderViewIndex();
@@ -656,6 +656,7 @@ public class OpenTCSView
 
   /**
    * Adds a new order sequence view.
+   * 增加新的运输订单序列视图
    */
   public void addTransportOrderSequenceView() {
     int biggestIndex = viewManager.getNextOrderSequenceViewIndex();
@@ -691,6 +692,7 @@ public class OpenTCSView
 
   /**
    * Restores the layout to default.
+   * 重置布局到默认状态
    */
   public void resetWindowArrangement() {
     for (DefaultSingleCDockable dock : new ArrayList<>(viewManager.getDrawingViewMap().keySet())) {

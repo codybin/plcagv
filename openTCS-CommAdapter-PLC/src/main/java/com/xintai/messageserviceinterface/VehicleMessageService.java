@@ -5,6 +5,7 @@
  */
 package com.xintai.messageserviceinterface;
 
+import com.google.inject.Inject;
 import com.serotonin.modbus4j.ModbusFactory;
 import com.serotonin.modbus4j.ModbusMaster;
 import com.serotonin.modbus4j.exception.ModbusInitException;
@@ -16,11 +17,13 @@ import com.serotonin.modbus4j.msg.WriteRegistersRequest;
 import com.serotonin.modbus4j.msg.WriteRegistersResponse;
 import com.xintai.adapter.OpentcsPointToKeCongPoint;
 import com.xintai.plc.comadpater.PLCComAdapter;
+import com.xintai.plc.comadpater.PLCCommAdapterConfiguration;
 import com.xintai.plc.comadpater.PLCProcessModel;
 import com.xintai.plc.message.NavigateControl;
 import com.xintai.plc.message.VehicleParameterSetWithPLC;
 import com.xintai.plc.message.VehicleStatePLC;
 import java.awt.event.ActionListener;
+import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.opentcs.data.model.Point;
@@ -32,9 +35,14 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
  * @author Lenovo
  */
 public class VehicleMessageService implements InterfaceMessageService{
+  private PLCCommAdapterConfiguration pLCCommAdapterConfiguration;
+ @Inject
+  public VehicleMessageService( PLCCommAdapterConfiguration pLCCommAdapterConfiguration) {
+    this.pLCCommAdapterConfiguration = requireNonNull(pLCCommAdapterConfiguration, "configuration");
+  }
 
  private  ModbusMaster master;
- 
+
   @Override
   public void SendNavigateComand(MovementCommand movementCommand,VehicleProcessModel  ProcessModel) {
     //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
@@ -58,7 +66,7 @@ public class VehicleMessageService implements InterfaceMessageService{
                                             .setTargetsitecardirection(0)
                                             .setTargetsite(0);
          System.out.println("com.xintai.plc.comadpater.PLCComAdapter.sendCommand()"+navigateControl.toString());
-          WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,2010,navigateControl.encodedata());
+          WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,pLCCommAdapterConfiguration.navigateoffset(),navigateControl.encodedata());
           WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
           result=true;
        //   orderIds.put(cmd, destinationid);
@@ -75,7 +83,7 @@ public class VehicleMessageService implements InterfaceMessageService{
        ReadHoldingRegistersRequest readholdingregisters;
    VehicleStatePLC vehicleStatePLC;
    try {
-     readholdingregisters = new ReadHoldingRegistersRequest(slaveid,999,50);
+     readholdingregisters = new ReadHoldingRegistersRequest(slaveid,pLCCommAdapterConfiguration.stateoffset(),pLCCommAdapterConfiguration.statelength());
      ReadHoldingRegistersResponse readHoldingRegistersResponse=(ReadHoldingRegistersResponse) master.send(readholdingregisters);
      if(readHoldingRegistersResponse!=null)
   vehicleStatePLC=new VehicleStatePLC(readHoldingRegistersResponse.getData());
@@ -132,7 +140,7 @@ public class VehicleMessageService implements InterfaceMessageService{
   @Override
   public void SendSettingTOPLC(VehicleParameterSetWithPLC vehicleParameterSetWithPLC) {
    try {
-     WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,1999+52, vehicleParameterSetWithPLC.getdata());
+     WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,pLCCommAdapterConfiguration.settingoffset(), vehicleParameterSetWithPLC.getdata());
      master.send(writeRegistersRequest);
      setConnected(true); 
      System.out.println("com.xintai.plc.comadpater.PLCComAdapter.propertyChange()"+vehicleParameterSetWithPLC.toString());
@@ -181,7 +189,7 @@ private int slaveid;
   public boolean HeartBeat() {
     boolean result=false;
    try {
-     WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid, 1999,new short[]{0,1} );
+     WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid, pLCCommAdapterConfiguration.heartbeat(),new short[]{1} );
      master.send(writeRegistersRequest);
      result=true;
    }
