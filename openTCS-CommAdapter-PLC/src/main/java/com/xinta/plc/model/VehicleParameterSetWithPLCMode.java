@@ -15,8 +15,10 @@ public class VehicleParameterSetWithPLCMode implements Serializable{
 
   @Override
   public String toString() {
-    return "VehicleParameterSetWithPLCMode{" + "heartbeatsignal=" + heartbeatsignal + ", agvvspeed=" + agvvspeed + ", agvaspeed=" + agvaspeed + ", remotestart=" + remotestart + ", navigationtask=" + navigationtask + ", nextsite=" + nextsite + ", nexttwosite=" + nexttwosite + ", targetsitecardirection=" + targetsitecardirection + ", targetsite=" + targetsite + ", currentschedulingtask=" + currentschedulingtask + ", materialcode=" + materialcode + ", chargingpilestate=" + chargingpilestate + ", iswrite=" + iswrite + '}';
+    return "VehicleParameterSetWithPLCMode{" + "heartbeatsignal=" + heartbeatsignal + ", agvvspeed=" + agvvspeed + ", agvaspeed=" + agvaspeed + ", standby1=" + getStandby1() + ", standby2=" + getStandby2() + ", standby3=" + getStandby3() + ", remotestart=" + remotestart + ", navigationtask=" + navigationtask + ", nextsite=" + nextsite + ", nexttwosite=" + nexttwosite + ", targetsitecardirection=" + targetsitecardirection + ", targetsite=" + targetsite + ", currentschedulingtask=" + currentschedulingtask + ", materialcode=" + materialcode + ", chargingpilestate=" + chargingpilestate + ", iswrite=" + iswrite + '}';
   }
+
+
 
   /**
    * @return the iswrite
@@ -41,6 +43,9 @@ public class VehicleParameterSetWithPLCMode implements Serializable{
   private int heartbeatsignal;
   private float agvvspeed;
   private float agvaspeed;
+  private float standby1;
+  private float standby2;
+  private float standby3;
   private int remotestart;
   private int navigationtask;
   private int nextsite;
@@ -51,7 +56,9 @@ public class VehicleParameterSetWithPLCMode implements Serializable{
   private int materialcode;
   private int chargingpilestate;
   private  boolean iswrite;
+
   public VehicleParameterSetWithPLCMode(int heartbeatsignal, float agvvspeed, float agvaspeed,
+                                        float standby1, float standby2, float standby3,
                                         int remotestart, int navigationtask, int nextsite,
                                         int nexttwosite, int targetsitecardirection, int targetsite,
                                         int currentschedulingtask, int materialcode,
@@ -59,6 +66,9 @@ public class VehicleParameterSetWithPLCMode implements Serializable{
     this.heartbeatsignal = heartbeatsignal;
     this.agvvspeed = agvvspeed;
     this.agvaspeed = agvaspeed;
+    this.standby1 = standby1;
+    this.standby2 = standby2;
+    this.standby3 = standby3;
     this.remotestart = remotestart;
     this.navigationtask = navigationtask;
     this.nextsite = nextsite;
@@ -70,6 +80,10 @@ public class VehicleParameterSetWithPLCMode implements Serializable{
     this.chargingpilestate = chargingpilestate;
     this.iswrite = iswrite;
   }
+
+ 
+  
+ 
 
   /**
    * @return the heartbeatsignal
@@ -238,4 +252,48 @@ public class VehicleParameterSetWithPLCMode implements Serializable{
   public void setChargingpilestate(int chargingpilestate) {
     this.chargingpilestate = chargingpilestate;
   }
+
+  /**
+   * @return the standby1
+   */
+  public float getStandby1() {
+    return standby1;
+  }
+
+  /**
+   * @param standby1 the standby1 to set
+   */
+  public void setStandby1(float standby1) {
+    this.standby1 = standby1;
+  }
+
+  /**
+   * @return the standby2
+   */
+  public float getStandby2() {
+    return standby2;
+  }
+
+  /**
+   * @param standby2 the standby2 to set
+   */
+  public void setStandby2(float standby2) {
+    this.standby2 = standby2;
+  }
+
+  /**
+   * @return the standby3
+   */
+  public float getStandby3() {
+    return standby3;
+  }
+
+  /**
+   * @param standby3 the standby3 to set
+   */
+  public void setStandby3(float standby3) {
+    this.standby3 = standby3;
+  }
+
+ 
 }

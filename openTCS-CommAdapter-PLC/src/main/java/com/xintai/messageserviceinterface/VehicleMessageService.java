@@ -58,7 +58,7 @@ public class VehicleMessageService implements InterfaceMessageService{
                                             .setTargetsitecardirection(0)
                                             .setTargetsite(0);
          System.out.println("com.xintai.plc.comadpater.PLCComAdapter.sendCommand()"+navigateControl.toString());
-          WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,1999+59,navigateControl.encodedata());
+          WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,2010,navigateControl.encodedata());
           WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
           result=true;
        //   orderIds.put(cmd, destinationid);

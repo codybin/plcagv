@@ -73,6 +73,7 @@ return byteQueue._popU2B();
    vehicleStateModel.setPositioningState(getint());
    vehicleStateModel.setBetweenSiteMileage(getfloatdate());
    vehicleStateModel.setNavigationalState(getint());
+   vehicleStateModel.setCurrentSiteCarDirection(getint());
    vehicleStateModel.setCurrentSchedulingTask(getint());
    vehicleStateModel.setMaterialStatus(getint());
    vehicleStateModel.setTaskStatus(getint());

@@ -1090,7 +1090,7 @@ private static final Logger LOG = LoggerFactory.getLogger(PLCControlForm.class);
           String materialcodeString= setMaterialCode.getText();
           String chargingpilestateString=String.valueOf(setChargingPileState.getSelectedIndex());
           
-          VehicleParameterSetWithPLCMode vps=new VehicleParameterSetWithPLCMode(Integer.valueOf(heartbeatsignalString),Float.parseFloat(vspeedString),Float.parseFloat(aspeedString),
+          VehicleParameterSetWithPLCMode vps=new VehicleParameterSetWithPLCMode(Integer.valueOf(heartbeatsignalString),Float.parseFloat(vspeedString),Float.parseFloat(aspeedString),0,0,0,
                                                                                 Integer.valueOf(remotestartString),Integer.valueOf(navigationtaskString),Integer.valueOf(nextsiteString),
                                                                                 Integer.valueOf(nexttwositeString),Integer.valueOf(targetsitecardirectionString),Integer.valueOf(targetsiteString),
                                                                                 Integer.valueOf(currentschedulingtaskString),Integer.valueOf(materialcodeString),Integer.valueOf(chargingpilestateString),true);

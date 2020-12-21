@@ -41,6 +41,7 @@ public class VehicleStateModel implements  Serializable {
    private int positioningState;
    private float betweenSiteMileage;
    private int navigationalState;
+   private int currentSiteCarDirection;
    private int currentSchedulingTask;
    private int materialStatus;
    private int taskStatus;
@@ -463,6 +464,20 @@ public class VehicleStateModel implements  Serializable {
    */
   public void setTaskStatus(int taskStatus) {
     this.taskStatus = taskStatus;
+  }
+
+  /**
+   * @return the currentSiteCarDirection
+   */
+  public int getCurrentSiteCarDirection() {
+    return currentSiteCarDirection;
+  }
+
+  /**
+   * @param currentSiteCarDirection the currentSiteCarDirection to set
+   */
+  public void setCurrentSiteCarDirection(int currentSiteCarDirection) {
+    this.currentSiteCarDirection = currentSiteCarDirection;
   }
 
   

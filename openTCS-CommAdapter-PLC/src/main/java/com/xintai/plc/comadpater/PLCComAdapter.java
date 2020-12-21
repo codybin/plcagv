@@ -223,7 +223,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
          VehicleParameterSetWithPLCMode vst= getProcessModel().getVehicleParameterSet();
          if(!vst.isIswrite()) return;
          VehicleParameterSetWithPLC vstp=new VehicleParameterSetWithPLC(vst.getHeartbeatsignal(),vst.getAgvvspeed(),
-         vst.getAgvaspeed(),vst.getRemotestart(),vst.getNavigationtask(),
+         vst.getAgvaspeed(),0,0,0,vst.getRemotestart(),vst.getNavigationtask(),
          vst.getNextsite(),vst.getNexttwosite(),vst.getTargetsitecardirection(),
          vst.getTargetsite(),vst.getCurrentschedulingtask(),vst.getMaterialcode(),
          vst.getChargingpilestate());
