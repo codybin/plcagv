@@ -22,7 +22,6 @@ import com.xintai.plc.comadpater.PLCProcessModel;
 import com.xintai.plc.message.NavigateControl;
 import com.xintai.plc.message.VehicleParameterSetWithPLC;
 import com.xintai.plc.message.VehicleStatePLC;
-import java.awt.event.ActionListener;
 import static java.util.Objects.requireNonNull;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -35,7 +34,7 @@ import org.opentcs.drivers.vehicle.VehicleProcessModel;
  * @author Lenovo
  */
 public class VehicleMessageService implements InterfaceMessageService{
-  private PLCCommAdapterConfiguration pLCCommAdapterConfiguration;
+  private final PLCCommAdapterConfiguration pLCCommAdapterConfiguration;
  @Inject
   public VehicleMessageService( PLCCommAdapterConfiguration pLCCommAdapterConfiguration) {
     this.pLCCommAdapterConfiguration = requireNonNull(pLCCommAdapterConfiguration, "configuration");
@@ -86,7 +85,7 @@ public class VehicleMessageService implements InterfaceMessageService{
      readholdingregisters = new ReadHoldingRegistersRequest(slaveid,pLCCommAdapterConfiguration.stateoffset(),pLCCommAdapterConfiguration.statelength());
      ReadHoldingRegistersResponse readHoldingRegistersResponse=(ReadHoldingRegistersResponse) master.send(readholdingregisters);
      if(readHoldingRegistersResponse!=null)
-  vehicleStatePLC=new VehicleStatePLC(readHoldingRegistersResponse.getData());
+    vehicleStatePLC=new VehicleStatePLC(readHoldingRegistersResponse.getData());
      else
        vehicleStatePLC=null;
    
@@ -110,16 +109,16 @@ public class VehicleMessageService implements InterfaceMessageService{
         try { 
         ModbusFactory modbusFactory = new ModbusFactory();
        if(master==null)
-           master = modbusFactory.createTcpMaster(ipParameters, true);
+          master = modbusFactory.createTcpMaster(ipParameters, true);
         master.setTimeout(3000);
         master.setRetries(2);
         master.init();
         resut=true;
-          System.out.println("com.xintai.messageserviceinterface.VehicleMessageService.Init()"+master.isInitialized());
     }
     catch (ModbusInitException ex) {
      resut=false;
     }
+        System.out.println("com.xintai.messageserviceinterface.VehicleMessageService  result"+resut);
        setConnected(resut); 
       return  resut;
     
@@ -178,9 +177,9 @@ private  PLCConnectListenner ConnectListenner;
     {
       master.setConnected(isconnect);
       if(!master.isConnected())
-       OnDisConnect();
+        OnDisConnect();
       else
-       OnConnect();
+        OnConnect();
     }
   }
 
@@ -190,7 +189,8 @@ private int slaveid;
     boolean result=false;
    try {
      WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid, pLCCommAdapterConfiguration.heartbeat(),new short[]{1} );
-     master.send(writeRegistersRequest);
+   WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
+     if(writeRegistersResponse!=null)
      result=true;
    }
    catch (ModbusTransportException ex) {

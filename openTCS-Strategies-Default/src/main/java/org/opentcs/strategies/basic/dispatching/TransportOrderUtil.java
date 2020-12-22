@@ -406,7 +406,7 @@ public class TransportOrderUtil
         LOG.debug("{}: To be disabled later", vehicle.getName());
         vehiclesToDisable.add(vehicle.getReference());
       }
-      vehicleController.abortDriveOrder();
+    vehicleController.abortDriveOrder();
       // XXX What if the controller does not have any more movements to be
       // finished? Will it ever re-dispatch the vehicle in that case?
     }

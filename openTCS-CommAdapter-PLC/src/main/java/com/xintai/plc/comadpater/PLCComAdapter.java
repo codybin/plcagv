@@ -32,7 +32,6 @@ import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.model.Vehicle;
-
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
@@ -341,7 +340,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
   protected boolean isVehicleConnected() {
    //To change body of generated methods, choose Tools | Templates.
   //return  master.isConnected();
-  return  true;
+  return  IVehicleMessageService.IsConnected();
   }
       @Override
   public final PLCProcessModel getProcessModel() {
@@ -580,6 +579,8 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
          Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
        }
     }
+     if(!isVehicleConnected())
+       return;
       MovementCommand movementCommand= getMovementCommandsBufferQueue().peek();
       if(movementCommand!=null)
       { if(getProcessModel().isIscharging())
