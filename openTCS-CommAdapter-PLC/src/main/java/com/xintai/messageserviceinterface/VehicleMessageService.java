@@ -47,14 +47,13 @@ public class VehicleMessageService implements InterfaceMessageService{
     //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
  if(!(ProcessModel instanceof  PLCProcessModel))
  return;
-   boolean result=false;
+  Object finalPoint= movementCommand.getFinalDestination().getName();
+   int finalpoint=PointTOINT(finalPoint); 
+     boolean result=false;
   PLCProcessModel PLCProcessModel=  (PLCProcessModel) ProcessModel;
        Object selectedItem = movementCommand.getStep().getDestinationPoint().getName();
-    String destinationIdString = selectedItem instanceof Point
-        ? ((Point) selectedItem).getName() : selectedItem.toString();
-    int destinationid=new  OpentcsPointToKeCongPoint(destinationIdString).getIntPoint(); 
+    int destinationid = PointTOINT(selectedItem); 
     System.out.println("com.xintai.vehicle.comadpter.KeCongCommAdapter.sendCommand()"+destinationid);
-    
     try {
       if( PLCProcessModel.getNextcurrentnavigationpoint()!=destinationid)
          PLCProcessModel.setNextcurrentnavigationpoint(destinationid);
@@ -63,11 +62,12 @@ public class VehicleMessageService implements InterfaceMessageService{
                                             .setRemotestart(0)
                                             .setNavigationtask(1)
                                             .setTargetsitecardirection(0)
-                                            .setTargetsite(0);
+                                            .setTargetsite(finalpoint);
          System.out.println("com.xintai.plc.comadpater.PLCComAdapter.sendCommand()"+navigateControl.toString());
           WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,pLCCommAdapterConfiguration.navigateoffset(),navigateControl.encodedata());
           WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
-          result=true;
+          if(writeRegistersResponse!=null)
+            result=true;
        //   orderIds.put(cmd, destinationid);
     }
     catch (ModbusTransportException ex) {
@@ -77,6 +77,12 @@ public class VehicleMessageService implements InterfaceMessageService{
    setConnected(result);
   }
 
+  private int PointTOINT(Object selectedItem) {
+      String destinationIdString = selectedItem instanceof Point
+              ? ((Point) selectedItem).getName() : selectedItem.toString();
+      int destinationid=new  OpentcsPointToKeCongPoint(destinationIdString).getIntPoint();
+    return destinationid;
+  }
   @Override
   public VehicleStatePLC SendStateRequest() {
        ReadHoldingRegistersRequest readholdingregisters;
@@ -138,16 +144,18 @@ public class VehicleMessageService implements InterfaceMessageService{
 
   @Override
   public void SendSettingTOPLC(VehicleParameterSetWithPLC vehicleParameterSetWithPLC) {
+   boolean result=false;
    try {
      WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,pLCCommAdapterConfiguration.settingoffset(), vehicleParameterSetWithPLC.getdata());
-     master.send(writeRegistersRequest);
-     setConnected(true); 
+      WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse) master.send(writeRegistersRequest);
+      if(writeRegistersResponse!=null)
+      result=true;
      System.out.println("com.xintai.plc.comadpater.PLCComAdapter.propertyChange()"+vehicleParameterSetWithPLC.toString());
    }
    catch (ModbusTransportException ex) {
-       setConnected(false); 
      Logger.getLogger(VehicleMessageService.class.getName()).log(Level.SEVERE, null, ex);
    }
+      setConnected(result); 
   }
 
  
