@@ -116,7 +116,7 @@ public class PLCProcessModel extends VehicleProcessModel  {
 
   private String vehicleHost;
   private int vehiclePort;
-   private VehicleStateModel previousVehicleStateModel;
+   private volatile VehicleStateModel previousVehicleStateModel;
   public PLCProcessModel(Vehicle attachedVehicle) {
     super(attachedVehicle);
     previousVehicleStateModel=new VehicleStateModel();
