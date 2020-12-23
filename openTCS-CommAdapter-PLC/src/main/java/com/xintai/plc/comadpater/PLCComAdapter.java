@@ -24,6 +24,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -177,7 +178,6 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
   public boolean isInitialized() {
     return initialized;
   }
-   
    @Override
   public synchronized void enable() {
     if (isEnabled()) {
@@ -201,9 +201,9 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     try {
       vehicleMessageSendTask=new VehicleMessageSendTask();
      vehicleActuralCyclicTask = new VehicleActuralTask();
-    new Thread(vehicleMessageSendTask,"messagesendtask").start();
-    Thread acturalThread = new Thread(vehicleActuralCyclicTask, getName() + "-VechicleactrualThread");
-    acturalThread.start();
+      new Thread(vehicleMessageSendTask,"messagesendtask").start();
+     Thread acturalThread = new Thread(vehicleActuralCyclicTask, getName() + "-VechicleactrualThread");
+     acturalThread.start();
    }
    catch (Exception ex) {
      java.util.logging.Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
@@ -234,6 +234,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
       return;
     }
     super.disable();
+    
    IVehicleMessageService.DisConnect();
     vehicleActuralCyclicTask.terminate();
     vehicleActuralCyclicTask = null;
@@ -399,9 +400,12 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     updateorder(currentVehicleStateModel, previousVehicleStateModel);
     }
     private boolean checkresponseisright(VehicleStateModel curVehicleStateModel,VehicleStateModel previousStateModel)
-    { 
-      /*  if(curVehicleStateModel.getCurrentSite()==previousStateModel.getCurrentSite())
-      return false;*/
+    { if(curVehicleStateModel.getCurrentSite()==0)
+    {
+    return false ;
+    }
+      if(curVehicleStateModel.getCurrentSite()==previousStateModel.getCurrentSite())
+      return false;
     int next= curVehicleStateModel.getNextSite();
     int nexttwo=curVehicleStateModel.getNextTwoSite();
    int storenext= getProcessModel().getCurrentnavigationpoint();
@@ -570,29 +574,19 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     
     @Override
     protected  void runActualTask() {
-     while(getMovementCommandsBufferQueue().isEmpty())
-    {
-       try {
-         Thread.sleep(100);
-       }
-       catch (InterruptedException ex) {
-         Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
-       }
-    }
      if(!isVehicleConnected())
-       return;
-      MovementCommand movementCommand= getMovementCommandsBufferQueue().peek();
-      if(movementCommand!=null)
+        return;
+      if(getProcessModel().getPreviousVehicleStateModel().getAgvRunState()==2)
+      {
+        MovementCommand movementCommand= getMovementCommandsBufferQueue().peek();
+       if(movementCommand!=null)
       { if(getProcessModel().isIscharging())
-      {       
+      {
       getProcessModel().setVehicleState(Vehicle.State.EXECUTING);//充电逻辑需要这边置置位状态为运行状态，否则充电状态无法取消。
       return;
       }
-        if(getProcessModel().getPreviousVehicleStateModel().getAgvRunState()==2)
-        { 
       IVehicleMessageService.SendNavigateComand(movementCommand,getProcessModel());
-        }
-        
+      }   
       }
     }
   }
