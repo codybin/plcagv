@@ -12,6 +12,9 @@ package com.xintai.plc.message;
  ***********************************************************************/
 
 
+import com.serotonin.modbus4j.code.DataType;
+import com.serotonin.modbus4j.code.RegisterRange;
+import com.serotonin.modbus4j.locator.NumericLocator;
 import com.xinta.plc.model.VehicleStateModel;
 import com.xintai.data.util.ByteQueue;
 import com.xintai.data.util.DataConvertUtl;
@@ -32,11 +35,12 @@ return byteQueue._popU2B();
    }
    private float getfloatdate()
    {
-     float f=0f;
-     byte[]buf=new byte[4];
-     byteQueue.pop(buf);
-     f=DataConvertUtl.getFloat(buf);
-   return  f;
+       NumericLocator num=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,1,DataType.FOUR_BYTE_FLOAT_SWAPPED);
+      float f=0f;
+     byte[]data=new byte[4];
+     byteQueue.pop(data);
+     return Float.intBitsToFloat(((data[2] & 0xff) << 24) | ((data[3] & 0xff) << 16)
+                    | ((data[0] & 0xff) << 8) | (data[1] & 0xff));
    }
    
    public VehicleStateModel GetVehicleStateModel()

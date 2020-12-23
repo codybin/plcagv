@@ -85,7 +85,7 @@ public class NavigateControl {
   private int targetsite;
   public short [] encodedata()
   {
-     NumericLocator num=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,62,DataType.TWO_BYTE_INT_SIGNED);
+     NumericLocator num=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,62,DataType.FOUR_BYTE_FLOAT_SWAPPED);
  short[]numbers1= num.valueToShorts(remotestart);
  short[]numbers2= num.valueToShorts(navigationtask);
  short[]numbers3= num.valueToShorts(nextsite);

@@ -90,7 +90,7 @@ public class PLCCommAdapterFactory
     }
     try {
     checkInRange(Integer.parseInt(vehicle.getProperty(PROPKEY_VEHICLE_PORT)),
-    1024,
+    100,
     65535);
      checkInRange(Integer.parseInt(vehicle.getProperty(SLAVE_ID)),
     0,
