@@ -57,11 +57,14 @@ public class VehicleMessageService implements InterfaceMessageService{
     try {
       if( PLCProcessModel.getNextcurrentnavigationpoint()!=destinationid)
          PLCProcessModel.setNextcurrentnavigationpoint(destinationid);
+      int finaldirection=0;
+      if(PLCProcessModel.getFinaldirection()!=null)
+        finaldirection= Integer.parseInt(PLCProcessModel.getFinaldirection());
     NavigateControl navigateControl =new NavigateControl().setNextsite(PLCProcessModel.getCurrentnavigationpoint())
                                             .setNexttwosite(PLCProcessModel.getNextcurrentnavigationpoint())
                                             .setRemotestart(0)
                                             .setNavigationtask(1)
-                                            .setTargetsitecardirection(0)
+                                            .setTargetsitecardirection(finaldirection)
                                             .setTargetsite(finalpoint);
          System.out.println("com.xintai.plc.comadpater.PLCComAdapter.sendCommand()"+navigateControl.toString());
           WriteRegistersRequest writeRegistersRequest=new WriteRegistersRequest(slaveid,pLCCommAdapterConfiguration.navigateoffset(),navigateControl.encodedata());

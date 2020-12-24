@@ -18,7 +18,16 @@ import static org.opentcs.util.Assertions.checkInRange;
  * @author Lenovo
  */
 public class PLCProcessModel extends VehicleProcessModel  {
- private volatile boolean  ischarging=false;
+private String finaldirection;
+
+  public String getFinaldirection() {
+    return finaldirection;
+  }
+
+  public void setFinaldirection(String finaldirection) {
+    this.finaldirection = finaldirection;
+  }
+  private volatile boolean  ischarging=false;
 
   public boolean isIscharging() {
     return ischarging;

@@ -8,6 +8,7 @@
 package org.opentcs.kernel.vehicles;
 
 import com.google.inject.assistedinject.Assisted;
+import com.xintai.plc.comadpater.PLCProcessModel;
 import com.xintai.vehicle.comadpter.KeCongCommAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -46,6 +47,7 @@ import org.opentcs.data.notification.UserNotification;
 import org.opentcs.data.order.DriveOrder;
 import org.opentcs.data.order.Route;
 import org.opentcs.data.order.Route.Step;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.LoadHandlingDevice;
 import org.opentcs.drivers.vehicle.MovementCommand;
@@ -54,6 +56,7 @@ import org.opentcs.drivers.vehicle.VehicleCommAdapterEvent;
 import org.opentcs.drivers.vehicle.VehicleController;
 import org.opentcs.drivers.vehicle.VehicleProcessModel;
 import org.opentcs.drivers.vehicle.management.ProcessModelEvent;
+import org.opentcs.kernel.workingset.TCSObjectPool;
 import static org.opentcs.util.Assertions.checkArgument;
 import static org.opentcs.util.Assertions.checkState;
 import org.opentcs.util.ExplainedBoolean;
@@ -164,6 +167,7 @@ public class DefaultVehicleController
    * 标志我们正在等待调度器分配资源，确保我们一次不分配超过一系列资源
    */
   private volatile boolean waitingForAllocation;
+  private final TCSObjectPool objectPool;
 
   /**
    * Creates a new instance associated with the given vehicle.
@@ -176,6 +180,7 @@ public class DefaultVehicleController
    * @param dispatcherService The kernel's dispatcher service.
    * @param scheduler The scheduler managing resource allocations.
    * @param eventBus The event bus this instance should register with and send events to.
+   * @param objectPool
    */
   @Inject
   public DefaultVehicleController(@Assisted @Nonnull Vehicle vehicle,
@@ -185,7 +190,8 @@ public class DefaultVehicleController
                                   @Nonnull NotificationService notificationService,
                                   @Nonnull DispatcherService dispatcherService,
                                   @Nonnull Scheduler scheduler,
-                                  @Nonnull @ApplicationEventBus EventBus eventBus) {
+                                  @Nonnull @ApplicationEventBus EventBus eventBus,
+                                  TCSObjectPool objectPool) {
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.commAdapter = requireNonNull(adapter, "adapter");
     this.localKernel = requireNonNull(kernel, "kernel");
@@ -194,6 +200,7 @@ public class DefaultVehicleController
     this.dispatcherService = requireNonNull(dispatcherService, "dispatcherService");
     this.scheduler = requireNonNull(scheduler, "scheduler");
     this.eventBus = requireNonNull(eventBus, "eventBus");
+    this.objectPool = requireNonNull(objectPool, "objectPool");
   }
 
   @Override
@@ -208,7 +215,6 @@ public class DefaultVehicleController
     }
 
     eventBus.subscribe(this);
-
     vehicleService.updateVehicleRechargeOperation(vehicle.getReference(),
                                                   commAdapter.getRechargeOperation());
     commAdapter.getProcessModel().addPropertyChangeListener(this);
@@ -295,7 +301,17 @@ if(commAdapter instanceof  KeCongCommAdapter)
     Vehicle currVehicleState = (Vehicle) objectEvent.getCurrentObjectState();
     if (prevVehicleState.getIntegrationLevel() != currVehicleState.getIntegrationLevel()) {
       onIntegrationLevelChange(prevVehicleState, currVehicleState);
-    }    
+    }  
+    //由于订单信息无法到插件中解析，所以放到此处
+    if(commAdapter.getProcessModel() instanceof PLCProcessModel)
+    {
+      if (currVehicleState.getTransportOrder() != null && prevVehicleState.getTransportOrder() == null) {
+     TCSObjectReference<TransportOrder> tCSObjectReference= currVehicleState.getTransportOrder();
+   TransportOrder transportOrder= objectPool.getObject(TransportOrder.class, tCSObjectReference);
+     String direction= transportOrder.getProperty("direction");
+    ((PLCProcessModel)commAdapter.getProcessModel()).setFinaldirection(direction);  
+    }
+    } 
   }
 
   @Override

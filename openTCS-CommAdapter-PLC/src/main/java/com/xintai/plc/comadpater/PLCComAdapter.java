@@ -31,8 +31,13 @@ import java.util.logging.Logger;
 import javax.annotation.Nonnull;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
+import org.opentcs.data.TCSObject;
 import org.opentcs.data.TCSObjectEvent;
+import org.opentcs.data.TCSObjectReference;
+import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
+import org.opentcs.data.order.DriveOrder;
+import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.MovementCommand;
 import org.opentcs.drivers.vehicle.management.VehicleProcessModelTO;
@@ -111,15 +116,23 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     getProcessModel().setVehicleState(Vehicle.State.IDLE);
     initialized = true;
   }
-
-  @Override
-  public void onEvent(Object event) {
-       if (!(event instanceof TCSObjectEvent)) {
+  private void processObjectEvent(TCSObjectEvent event) {
+    TCSObject<?> object = event.getCurrentOrPreviousObjectState();
+    if (object instanceof TransportOrder) {
+      processOrderEvent(event);
+    }
+    else if (object instanceof Vehicle) {
+      processVehicleEvent(event);
+    }
+  }
+  
+  private void processVehicleEvent(TCSObjectEvent objectEvent) {
+    if (objectEvent.getPreviousObjectState() == null || objectEvent.getCurrentObjectState() == null) {
+      // We cannot compare two states to find out what happened - ignore.
       return;
     }
-
-    TCSObjectEvent objectEvent = (TCSObjectEvent) event;
-    if (objectEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED) {
+  
+   if (objectEvent.getType() != TCSObjectEvent.Type.OBJECT_MODIFIED) {
       return;
     }
 
@@ -136,7 +149,8 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     Vehicle currVehicleState = (Vehicle) objectEvent.getCurrentObjectState();
         // Did the vehicle get a transport order?
     if (currVehicleState.getTransportOrder() != null && prevVehicleState.getTransportOrder() == null) {
-   
+     TCSObjectReference<TransportOrder> tCSObjectReference= currVehicleState.getTransportOrder();
+     
     }
     // Did the vehicle finish a transport order?
     if (currVehicleState.getTransportOrder() == null && prevVehicleState.getTransportOrder() != null) {
@@ -172,7 +186,50 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
         && !prevVehicleState.hasState(Vehicle.State.EXECUTING)) {
       
     }
+  
+  
   }
+  //留着后续可能有用
+   private void processOrderEvent(TCSObjectEvent event) {
+    if (event.getPreviousObjectState() == null || event.getCurrentObjectState() == null) {
+      // We cannot compare two states to find out what happened - ignore.
+      return;
+    }
+
+    TransportOrder orderOld = (TransportOrder) event.getPreviousObjectState();
+    TransportOrder orderNow = (TransportOrder) event.getCurrentObjectState();
+ if( orderNow.getProcessingVehicle()!=null&&!orderNow.getProcessingVehicle().getName().equals(vehicle.getName()))
+     return;
+    // Has the order been activated?
+    if (orderNow.hasState(TransportOrder.State.ACTIVE)
+        && !orderOld.hasState(TransportOrder.State.ACTIVE)) {
+    }
+    // Has the order been assigned to a vehicle?
+    if (orderNow.hasState(TransportOrder.State.BEING_PROCESSED)
+        && !orderOld.hasState(TransportOrder.State.BEING_PROCESSED)) {
+    }
+    // Has the order been finished?
+    if (orderNow.hasState(TransportOrder.State.FINISHED)
+        && !orderOld.hasState(TransportOrder.State.FINISHED)) {
+      // Check the order's deadline. Has it been crossed?
+      if (orderNow.getFinishedTime().isAfter(orderNow.getDeadline())) {
+      }
+    }
+    // Has the order failed?
+    if (orderNow.hasState(TransportOrder.State.FAILED)
+        && !orderOld.hasState(TransportOrder.State.FAILED)) {
+    }
+  }
+  
+  @Override
+  public void onEvent(Object event) {
+       if (!(event instanceof TCSObjectEvent)) {
+      return;
+    }
+    TCSObjectEvent objectEvent = (TCSObjectEvent) event;
+    processObjectEvent( objectEvent);
+  }
+  
  
     @Override
   public boolean isInitialized() {
