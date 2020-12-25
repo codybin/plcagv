@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.xintai.informatiomn.SinceTechInformation;
+import com.xintai.interaction.erp.FinshInforFromERP;
 import java.io.IOException;
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
@@ -115,6 +116,8 @@ public class V1RequestHandler
                  this::handlePostWithdrawalByOrder);
     service.post("/transportOrders/:NAME",
                  this::handlePostTransportOrder);
+    service.post("/finshNotice/",
+                 this::handlePostFinshInformationFromERP);
     service.get("/transportOrders/:NAME",
                 this::handleGetTransportOrderByName);
     service.get("/transportOrders",
@@ -151,7 +154,13 @@ public class V1RequestHandler
     response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
     return "";
   }
-
+  
+    private Object handlePostFinshInformationFromERP(Request request, Response response)
+      throws ObjectUnknownException {
+statusInformationProvider.handerfinshinformationfromerp(fromJson(request.body(), FinshInforFromERP.class));
+    response.type(HttpConstants.CONTENT_TYPE_TEXT_PLAIN_UTF8);
+    return "";
+  }
   private Object handlePostWithdrawalByVehicle(Request request, Response response)
       throws ObjectUnknownException {
     orderHandler.withdrawByVehicle(request.params(":NAME"),

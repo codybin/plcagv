@@ -7,6 +7,7 @@
  */
 package org.opentcs.kernel.extensions.servicewebapi.v1.status;
 
+import com.xintai.interaction.erp.FinshInforFromERP;
 import java.util.List;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.ExecutorService;
@@ -24,6 +25,7 @@ import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.TransportOr
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.binding.VehicleState;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.filter.TransportOrderFilter;
 import org.opentcs.kernel.extensions.servicewebapi.v1.status.filter.VehicleFilter;
+import org.opentcs.kernel.extensions.servicewebapi.v1.status.filter.VehicleFilterByPoint;
 /**
  * Handles requests for getting the current state of model elements.
  *
@@ -152,6 +154,23 @@ public class RequestStatusHandler {
         () -> vehicleService.updateVehicleIntegrationLevel(vehicle.getReference(), level)
     );
   }
+  public void handerfinshinformationfromerp(FinshInforFromERP finshInforFromERP)
+{
+  List<Vehicle> vehicles = orderService.fetchObjects(Vehicle.class,
+                                                   new VehicleFilterByPoint(finshInforFromERP.getLocation()))
+        .stream()
+        .collect(Collectors.toList());
+  if(vehicles.size()==1)
+  {
+  Vehicle vehicle = vehicles.get(0);
+    kernelExecutor.submit(
+        () ->{
+       vehicleService.sendCommAdapterMessage(vehicle.getReference(), new SetFinshMarkFromMes(finshInforFromERP.getFinish()));
+        });
+  } else {
+      throw new ObjectUnknownException("Unknown device comand or no vehicle parking in this site: " + finshInforFromERP.getLocation());
+    }
+}
  public void putMESFinshWork(String name, String value)
       throws ObjectUnknownException, IllegalArgumentException {
     requireNonNull(name, "name");
