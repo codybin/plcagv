@@ -7,6 +7,8 @@ package com.xintai.plc.comadpater;
 
 import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
+import com.xinta.plc.model.VehicleTaskState;
+import com.xintai.messageserviceinterface.TaskInteractionInformation;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
 import org.opentcs.data.model.Vehicle;
@@ -19,6 +21,8 @@ import static org.opentcs.util.Assertions.checkInRange;
  */
 public class PLCProcessModel extends VehicleProcessModel  {
 private String finaldirection;
+  private String loadOperation;
+  private String unloadOperation;
 
   public String getFinaldirection() {
     return finaldirection;
@@ -122,13 +126,60 @@ private String finaldirection;
                                                   oldValue,
                                                   previousVehicleStateModel);
   }
+private VehicleTaskState vehicleTaskState;
+public  VehicleTaskState getVehicleTaskState()
+  {
+  return  vehicleTaskState;
+  }
+  public void setVehicleTaskState(VehicleTaskState vehicleTaskState)
+  {
+  this.vehicleTaskState=vehicleTaskState;
+  }
+  
 
+  private  TaskInteractionInformation taskInteractionInformation;
+  
+  public  TaskInteractionInformation getTaskInteractionInformation()
+  {
+  return  taskInteractionInformation;
+  }
+  public void setTaskInteractionInformation(TaskInteractionInformation taskInteractionInformation)
+  {
+  this.taskInteractionInformation=taskInteractionInformation;
+  }
+  
   private String vehicleHost;
   private int vehiclePort;
    private volatile VehicleStateModel previousVehicleStateModel;
   public PLCProcessModel(Vehicle attachedVehicle) {
     super(attachedVehicle);
     previousVehicleStateModel=new VehicleStateModel();
+    this.loadOperation = extractLoadOperation(attachedVehicle);
+    this.unloadOperation = extractUnloadOperation(attachedVehicle);
+  }
+   public String getLoadOperation() {
+    return this.loadOperation;
+  }
+ public String getChargerOperation() {
+    return "Charge";
+  }
+  public String getUnloadOperation() {
+    return this.unloadOperation;
+  }
+  private static String extractLoadOperation(Vehicle attachedVehicle) {
+    String result = attachedVehicle.getProperty(PLCAdapterConstants.PROPKEY_LOAD_OPERATION);
+    if (result == null) {
+      result = PLCAdapterConstants.PROPVAL_LOAD_OPERATION_DEFAULT;
+    }
+    return result;
+  }
+
+  private static String extractUnloadOperation(Vehicle attachedVehicle) {
+    String result = attachedVehicle.getProperty(PLCAdapterConstants.PROPKEY_UNLOAD_OPERATION);
+    if (result == null) {
+      result = PLCAdapterConstants.PROPVAL_UNLOAD_OPERATION_DEFAULT;
+    }
+    return result;
   }
     @Nonnull
   public synchronized String getVehicleHost() {

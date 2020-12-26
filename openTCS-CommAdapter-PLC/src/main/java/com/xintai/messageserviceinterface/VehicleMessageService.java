@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package com.xintai.messageserviceinterface;
 
 import com.google.inject.Inject;
@@ -47,10 +43,22 @@ public class VehicleMessageService implements InterfaceMessageService{
     //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
  if(!(ProcessModel instanceof  PLCProcessModel))
  return;
+   PLCProcessModel PLCProcessModel=  (PLCProcessModel) ProcessModel;
+  String operationString= movementCommand.getFinalOperation();
+    System.out.println("com.xintai.messageserviceinterface.VehicleMessageService.SendNavigateComand()"+movementCommand.toString());
+  DispacherTaskState dispacherTaskState= operationtodispacherTaskState(operationString);
+   if(PLCProcessModel.getVehicleTaskState().getDispacherTaskState()!=dispacherTaskState)
+   {
+   TaskInteractionInformation taskInteractionInformation=new TaskInteractionInformation();
+   taskInteractionInformation.setDispacherTaskState(dispacherTaskState);
+   taskInteractionInformation.setMaterialnum(10);
+   taskInteractionInformation.setChargerStaionState(ChargerStaionState.ChargerTail_out);
+   sendtaskinformation(taskInteractionInformation);
+   }
   Object finalPoint= movementCommand.getFinalDestination().getName();
    int finalpoint=PointTOINT(finalPoint); 
      boolean result=false;
-  PLCProcessModel PLCProcessModel=  (PLCProcessModel) ProcessModel;
+
        Object selectedItem = movementCommand.getStep().getDestinationPoint().getName();
     int destinationid = PointTOINT(selectedItem); 
     System.out.println("com.xintai.vehicle.comadpter.KeCongCommAdapter.sendCommand()"+destinationid);
@@ -79,6 +87,36 @@ public class VehicleMessageService implements InterfaceMessageService{
     } 
    setConnected(result);
   }
+private DispacherTaskState operationtodispacherTaskState(String opertaion)
+{
+  switch(opertaion)
+  {
+    case "Charge":
+      return  DispacherTaskState.Charging_TASK;
+    case "Unload":
+      return  DispacherTaskState.UNLoadEmpty_TASK;
+     case "Load cargo":
+       return DispacherTaskState.LoadEmpty_TASK;
+  default:
+      return null;
+  }
+}
+private void sendtaskinformation(TaskInteractionInformation taskInteractionInformation)
+{
+EncodeTaskInterActionInformation encodeTaskInterActionInformation=new EncodeTaskInterActionInformation(taskInteractionInformation);
+   short[] data= encodeTaskInterActionInformation.EncodeMessage();
+       WriteRegistersRequest writeRegistersRequest;
+    try {
+      writeRegistersRequest = new WriteRegistersRequest(slaveid,2016,data);
+        WriteRegistersResponse writeRegistersResponse=(WriteRegistersResponse)master.send(writeRegistersRequest);
+    }
+    catch (ModbusTransportException ex) {
+      Logger.getLogger(VehicleMessageService.class.getName()).log(Level.SEVERE, null, ex);
+    }
+        
+//
+
+}
 
   private int PointTOINT(Object selectedItem) {
       String destinationIdString = selectedItem instanceof Point

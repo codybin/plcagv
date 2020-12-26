@@ -96,6 +96,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
               if(vehicleStatePLC!=null)
               {   
                   responsesQueue.add(vehicleStatePLC);
+                  getProcessModel().setVehicleTaskState(vehicleStatePLC.getVehicleTaskState());
               }
              processindex++;
               break;
