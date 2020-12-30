@@ -98,6 +98,7 @@ public class PathLockAdapter
         // Update the path in the kernel if it exists and its locked state is different.
         Path path = portal.getPlantModelService().fetchObject(Path.class, model.getName());
         if (path != null && path.isLocked() != locked) {
+          LOG.info("PathLockAdpater Changed");
           portal.getRouterService().updatePathLock(path.getReference(), locked);
           portal.getRouterService().updateRoutingTopology();
         }

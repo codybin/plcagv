@@ -46,4 +46,9 @@ public interface RemoteDispatcherService
                                 TCSObjectReference<TransportOrder> ref,
                                 boolean immediateAbort)
       throws RemoteException;
+  /***
+ * Support retoute if a vehicle arrives the destination of a path
+ * @param clientID 
+ */
+void vehicleUpdatedProcessIndex(ClientID clientID)  throws RemoteException;
 }

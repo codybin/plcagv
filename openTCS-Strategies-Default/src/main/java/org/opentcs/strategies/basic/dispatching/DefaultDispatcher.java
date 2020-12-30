@@ -254,4 +254,15 @@ public class DefaultDispatcher
     return true;
   }
 
+  @Override
+  public void vehicleUpdateProgressIndex() {
+   if(configuration.rerouteTrigger()==DefaultDispatcherConfiguration.RerouteTrigger.ROUTE_STEP_FINISHED)
+   {  LOG.debug("Scheduling reroute task...");
+      kernelExecutor.submit(() -> {
+        LOG.debug("Rerouting vehicles due to a vehicle  updated processindex...");
+        rerouteUtil.reroute(vehicleService.fetchObjects(Vehicle.class));
+      });
+   }
+  }
+
 }

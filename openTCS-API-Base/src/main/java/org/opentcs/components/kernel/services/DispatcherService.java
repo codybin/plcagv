@@ -7,7 +7,9 @@
  */
 package org.opentcs.components.kernel.services;
 
+import java.rmi.RemoteException;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.rmi.ClientID;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
@@ -59,4 +61,10 @@ public interface DispatcherService {
    */
   void withdrawByTransportOrder(TCSObjectReference<TransportOrder> ref, boolean immediateAbort)
       throws ObjectUnknownException, KernelRuntimeException;
+/***
+ * Support retoute if a vehicle arrives the destination of a path
+ * @param clientID 
+ */
+void vehicleUpdatedProcessIndex() ;
+
 }

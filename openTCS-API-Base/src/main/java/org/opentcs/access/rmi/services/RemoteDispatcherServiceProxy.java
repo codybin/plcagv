@@ -9,6 +9,7 @@ package org.opentcs.access.rmi.services;
 
 import java.rmi.RemoteException;
 import org.opentcs.access.KernelRuntimeException;
+import org.opentcs.access.rmi.ClientID;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.data.ObjectUnknownException;
 import org.opentcs.data.TCSObjectReference;
@@ -68,5 +69,16 @@ class RemoteDispatcherServiceProxy
     catch (RemoteException ex) {
       throw findSuitableExceptionFor(ex);
     }
+  }
+
+  @Override
+  public void vehicleUpdatedProcessIndex() 
+  {   try {
+      getRemoteService().vehicleUpdatedProcessIndex(getClientId());
+    }
+    catch (RemoteException ex) {
+      throw findSuitableExceptionFor(ex);
+    }
+  
   }
 }

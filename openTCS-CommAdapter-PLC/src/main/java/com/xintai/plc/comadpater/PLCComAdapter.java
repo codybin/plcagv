@@ -73,7 +73,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
                             @KernelExecutor ExecutorService kernelExecutor,
                              @Nonnull @ApplicationEventBus EventBus eventBus,
                            VehicleMessageService vehicleMessageService  ) {
-    super(new PLCProcessModel(vehicle), 3, 2, LoadAction.CHARGE, kernelExecutor);
+    super(new PLCProcessModel(vehicle), 4, 2, LoadAction.CHARGE, kernelExecutor);
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.componentsFactory = requireNonNull( componentsFactory, "componentsFactory");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
@@ -458,12 +458,12 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     updateorder(currentVehicleStateModel, previousVehicleStateModel);
     }
     private boolean checkresponseisright(VehicleStateModel curVehicleStateModel,VehicleStateModel previousStateModel)
-    { if(curVehicleStateModel.getCurrentSite()==0)
+    { if(curVehicleStateModel.getCurrentSite()==0||curVehicleStateModel.getAgvRunState()!=2)
     {
     return false ;
     }
-      if(curVehicleStateModel.getCurrentSite()==previousStateModel.getCurrentSite())
-      return false;
+    /*   if(curVehicleStateModel.getCurrentSite()==previousStateModel.getCurrentSite())
+    return false;*/
     int next= curVehicleStateModel.getNextSite();
     int nexttwo=curVehicleStateModel.getNextTwoSite();
    int storenext= getProcessModel().getCurrentnavigationpoint();

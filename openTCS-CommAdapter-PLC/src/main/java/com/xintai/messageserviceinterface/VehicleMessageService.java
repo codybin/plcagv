@@ -58,7 +58,6 @@ public class VehicleMessageService implements InterfaceMessageService{
   Object finalPoint= movementCommand.getFinalDestination().getName();
    int finalpoint=PointTOINT(finalPoint); 
      boolean result=false;
-
        Object selectedItem = movementCommand.getStep().getDestinationPoint().getName();
     int destinationid = PointTOINT(selectedItem); 
     System.out.println("com.xintai.vehicle.comadpter.KeCongCommAdapter.sendCommand()"+destinationid);

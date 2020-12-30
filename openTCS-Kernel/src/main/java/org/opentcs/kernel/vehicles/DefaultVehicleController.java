@@ -947,6 +947,9 @@ if(commAdapter instanceof  KeCongCommAdapter)
       vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
                                                      moveCommand.getStep().getRouteIndex());
       // Let the scheduler know where we are now.
+      //每次更新点都更新路由来源//baijiahao.baidu.com/s?id=1664560931613429318
+      dispatcherService.vehicleUpdatedProcessIndex();
+      
       scheduler.updateProgressIndex(this, moveCommand.getStep().getRouteIndex());
     }
     else if (position == null) {

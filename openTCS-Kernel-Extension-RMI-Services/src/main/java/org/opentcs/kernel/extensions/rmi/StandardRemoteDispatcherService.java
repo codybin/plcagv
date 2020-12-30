@@ -193,4 +193,18 @@ public class StandardRemoteDispatcherService
       throw findSuitableExceptionFor(exc);
     }
   }
+
+  @Override
+  public void vehicleUpdatedProcessIndex(ClientID clientID)
+      throws RemoteException {
+     userManager.verifyCredentials(clientID, UserPermission.MODIFY_ORDER);
+
+    try {
+      kernelExecutor.submit(() -> dispatcherService.vehicleUpdatedProcessIndex())
+          .get();
+    }
+    catch (InterruptedException | ExecutionException exc) {
+      throw findSuitableExceptionFor(exc);
+    }
+  }
 }

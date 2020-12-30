@@ -95,7 +95,8 @@ public interface DefaultDispatcherConfiguration {
         "Possible values:",
         "NONE: Rerouting is disabled.",
         "DRIVE_ORDER_FINISHED: Vehicles get rerouted as soon as they finish a drive order.",
-        "TOPOLOGY_CHANGE: Vehicles get rerouted immediately on topology changes."
+        "TOPOLOGY_CHANGE: Vehicles get rerouted immediately on topology changes.",
+        "ROUTE_STEP_FINISHED:Vehicles get reroutede as soon as thet arrive the destination of a route step"
       },
       orderKey = "1_orders_special_2")
   RerouteTrigger rerouteTrigger();
@@ -155,7 +156,8 @@ public interface DefaultDispatcherConfiguration {
   enum RerouteTrigger {
     NONE,
     DRIVE_ORDER_FINISHED,
-    TOPOLOGY_CHANGE;
+    TOPOLOGY_CHANGE,
+    ROUTE_STEP_FINISHED;
   }
 
   enum ReroutingImpossibleStrategy {

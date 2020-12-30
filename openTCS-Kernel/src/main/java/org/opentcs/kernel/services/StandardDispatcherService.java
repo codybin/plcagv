@@ -9,6 +9,7 @@ package org.opentcs.kernel.services;
 
 import static java.util.Objects.requireNonNull;
 import javax.inject.Inject;
+import org.opentcs.access.rmi.ClientID;
 import org.opentcs.components.kernel.Dispatcher;
 import org.opentcs.components.kernel.services.DispatcherService;
 import org.opentcs.customizations.kernel.GlobalSyncObject;
@@ -78,5 +79,10 @@ public class StandardDispatcherService
       dispatcher.withdrawOrder(globalObjectPool.getObject(TransportOrder.class, ref),
                                immediateAbort);
     }
+  }
+
+  @Override
+  public void vehicleUpdatedProcessIndex() {
+  dispatcher.vehicleUpdateProgressIndex();
   }
 }
