@@ -54,5 +54,20 @@ public interface PLCCommAdapterConfiguration {
       description = "HeartBeatOffset",
       orderKey = "5")
   int heartbeat();
+    @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether to register/enable report postion to erp.",
+      orderKey = "6")
+  boolean noticeposition_enable();
+   @ConfigurationEntry(
+      type = "String",
+      description = "the port to report postion",
+      orderKey = "7")
+  String reportpostionurl_url();
+   @ConfigurationEntry(
+      type = "Boolean",
+      description = "Whether to stop vehicle before five or more points.",
+      orderKey = "8")
+  boolean stopvehicle_enable();
 }
 
