@@ -9,6 +9,7 @@ package org.opentcs.kernel.vehicles;
 
 import com.google.inject.assistedinject.Assisted;
 import com.xintai.plc.comadpater.PLCProcessModel;
+import com.xintai.erp.OrderInfor;
 import com.xintai.vehicle.comadpter.KeCongCommAdapter;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -309,6 +310,11 @@ if(commAdapter instanceof  KeCongCommAdapter)
      TCSObjectReference<TransportOrder> tCSObjectReference= currVehicleState.getTransportOrder();
    TransportOrder transportOrder= objectPool.getObject(TransportOrder.class, tCSObjectReference);
      String direction= transportOrder.getProperty("direction");
+     String ordername=transportOrder.getProperty("ordername");
+     String ordetype=transportOrder.getProperty("ordertype");
+     String orderdenpendent=transportOrder.getProperty("orderisdenpendent");
+     OrderInfor orderInfor=new OrderInfor(ordername, ordetype, orderdenpendent);
+     ((PLCProcessModel)commAdapter.getProcessModel()).setOrderInfor(orderInfor);
     ((PLCProcessModel)commAdapter.getProcessModel()).setFinaldirection(direction);  
     }
     } 
