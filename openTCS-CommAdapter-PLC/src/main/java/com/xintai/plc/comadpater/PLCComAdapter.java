@@ -9,26 +9,34 @@ import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
+import com.xintai.adapter.OpentcsPointToKeCongPoint;
 import com.xintai.charger.wrapper.ChargerUtl;
+import com.xintai.erp.ReportCarPostionTOERP;
+import com.xintai.erp.ReportPostionERPService;
 import com.xintai.messageserviceinterface.IPParameter;
 import com.xintai.messageserviceinterface.InterfaceMessageService;
 import com.xintai.messageserviceinterface.VehicleMessageService;
+import com.xintai.plc.filterpoint.FilterPoint;
 import com.xintai.plc.message.VehicleParameterSetWithPLC;
 import com.xintai.plc.message.VehicleStatePLC;
 import java.beans.PropertyChangeEvent;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import static java.util.Objects.requireNonNull;
 import java.util.Queue;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
+import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.customizations.ApplicationEventBus;
 import org.opentcs.customizations.kernel.KernelExecutor;
 import org.opentcs.data.TCSObject;
@@ -36,7 +44,7 @@ import org.opentcs.data.TCSObjectEvent;
 import org.opentcs.data.TCSObjectReference;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
-import org.opentcs.data.order.DriveOrder;
+import org.opentcs.data.order.Route.Step;
 import org.opentcs.data.order.TransportOrder;
 import org.opentcs.drivers.vehicle.BasicVehicleCommAdapter;
 import org.opentcs.drivers.vehicle.MovementCommand;
@@ -67,19 +75,27 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
    private final Map<MovementCommand, Integer> orderIds = new ConcurrentHashMap<>();
  private ChargerUtl chargerUtl;
   
+  private final PLCCommAdapterConfiguration pLCCommAdapterConfiguration;
+  private final FilterPoint filterpoint;
+  
 @Inject
     public PLCComAdapter(@Assisted Vehicle vehicle,
                             PLCAdapterComponentsFactory componentsFactory,
                             @KernelExecutor ExecutorService kernelExecutor,
                              @Nonnull @ApplicationEventBus EventBus eventBus,
-                           VehicleMessageService vehicleMessageService  ) {
+                           VehicleMessageService vehicleMessageService ,
+                           PLCCommAdapterConfiguration pLCCommAdapterConfiguration,
+                           InternalPlantModelService plantModelService ,
+                           FilterPoint filterPoint) {
     super(new PLCProcessModel(vehicle), 4, 2, LoadAction.CHARGE, kernelExecutor);
     this.vehicle = requireNonNull(vehicle, "vehicle");
     this.componentsFactory = requireNonNull( componentsFactory, "componentsFactory");
     this.kernelExecutor = requireNonNull(kernelExecutor, "kernelExecutor");
     this.eventBus = requireNonNull(eventBus, "eventBus");
+    this.filterpoint=requireNonNull(filterPoint, "filterPoint");
      IVehicleMessageService= requireNonNull(vehicleMessageService, "vehicleMessageService");
-  }
+     this.pLCCommAdapterConfiguration=requireNonNull(pLCCommAdapterConfiguration,"pLCCommAdapterConfiguration");
+    }
   
     private int processindex=0;
   @Override
@@ -470,6 +486,13 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
    int storenexttwo=getProcessModel().getNextcurrentnavigationpoint();
     if(next==storenext&storenexttwo==nexttwo)
     {
+    MovementCommand movementCommand1=  getMovementCommandsBufferQueue().peek();
+  if(movementCommand1!=null)
+  {
+    //如果当前命令的点和发送给设备的最新点不一致，说明当前点还没有发送给设备，所以不讲当前命令移除队列
+   if(new OpentcsPointToKeCongPoint(movementCommand1.getStep().getDestinationPoint().getName()).getIntPoint()!=nexttwo)
+      return false;
+  }
       MovementCommand movementCommand= getMovementCommandsBufferQueue().poll();
     if(movementCommand!=null)
     { orderIds.putIfAbsent(movementCommand, nexttwo);
@@ -510,8 +533,9 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
     }
      private void excutefinalaction(MovementCommand cmd)
      {System.out.println("1");
-       if(cmd.isFinalMovement()&cmd.isWithoutOperation())
-       {
+    
+    if(cmd.isFinalMovement()&cmd.isWithoutOperation())
+     {
       System.out.println("2");
     System.out.println("3");
      System.out.println("com.xintai.plc.comadpater.PLCComAdapter.VehicleActuralTask.excutefinalaction()");
@@ -560,7 +584,6 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
      {
        this.cmd=cmd;
      }
-
      @Override
      public void run() 
      {
@@ -608,6 +631,8 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
      if( cmd.isFinalMovement()&("Point-"+String.format("%04d",curVehicleStateModel.getCurrentSite())) == null ? cmd.getFinalDestination().getName() == null : ("Point-"+String.format("%04d",curVehicleStateModel.getCurrentSite())).equals(cmd.getFinalDestination().getName()))
      {
      lastmcdmark=true;
+     if(pLCCommAdapterConfiguration.noticeposition_enable())
+        noticeerppostion(curVehicleStateModel, cmd);
      excutefinalaction(cmd);
      break;
      }
@@ -620,9 +645,17 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
      getProcessModel().commandExecuted(cmd);
      }
     }
-    
+
+    private void noticeerppostion(VehicleStateModel curVehicleStateModel, MovementCommand cmd) {
+        ReportCarPostionTOERP rcptoerp=new ReportCarPostionTOERP(getProcessModel().getOrderInfor().getOrdername(),
+                getProcessModel().getOrderInfor().getOrdertype(),
+                getProcessModel().getVehicleTaskState().getMaterialState().toString(),
+                String.valueOf(curVehicleStateModel.getCurrentSite()),
+                cmd.getFinalOperation());
+        ReportPostionERPService reportPostionERPService=new ReportPostionERPService(pLCCommAdapterConfiguration.reportpostionurl_url());
+          reportPostionERPService.SendPostionTOERP(rcptoerp);
+    }  
   }
-  
   private  class VehicleMessageSendTask extends CyclicTask
   {
 
@@ -643,10 +676,12 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
       getProcessModel().setVehicleState(Vehicle.State.EXECUTING);//充电逻辑需要这边置置位状态为运行状态，否则充电状态无法取消。
       return;
       }
-      IVehicleMessageService.SendNavigateComand(movementCommand,getProcessModel());
+     if(pLCCommAdapterConfiguration.stopvehicle_enable()&&filterpoint.verifycanrun(movementCommand,vehicle))
+          return;
+  IVehicleMessageService.SendNavigateComand(movementCommand,getProcessModel());
       }   
       }
-    }
+    }  
   }
      
 }

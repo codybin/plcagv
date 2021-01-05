@@ -8,6 +8,7 @@ package com.xintai.plc.comadpater;
 import com.xinta.plc.model.VehicleParameterSetWithPLCMode;
 import com.xinta.plc.model.VehicleStateModel;
 import com.xinta.plc.model.VehicleTaskState;
+import com.xintai.erp.OrderInfor;
 import com.xintai.messageserviceinterface.TaskInteractionInformation;
 import static java.util.Objects.requireNonNull;
 import javax.annotation.Nonnull;
@@ -23,7 +24,15 @@ public class PLCProcessModel extends VehicleProcessModel  {
 private String finaldirection;
   private String loadOperation;
   private String unloadOperation;
+private   OrderInfor orderInfor;
 
+  public OrderInfor getOrderInfor() {
+    return orderInfor;
+  }
+
+  public void setOrderInfor(OrderInfor orderInfor) {
+    this.orderInfor = orderInfor;
+  }
   public String getFinaldirection() {
     return finaldirection;
   }
