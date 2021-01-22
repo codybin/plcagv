@@ -110,6 +110,7 @@ public class AssignNextDriveOrdersPhase
     LOG.debug("Vehicle '{}' finished a drive order.", vehicle.getName());
     // The vehicle is processing a transport order and has finished a drive order.
     // See if there's another drive order to be processed.
+    //更新到下一个订单序列
     transportOrderService.updateTransportOrderNextDriveOrder(vehicle.getTransportOrder());
     TransportOrder vehicleOrder = transportOrderService.fetchObject(TransportOrder.class,
                                                                     vehicle.getTransportOrder());
@@ -126,6 +127,7 @@ public class AssignNextDriveOrdersPhase
       // Let the router know that the vehicle doesn't have a route any more.
       router.selectRoute(vehicle, null);
       // Update transport orders that are dispatchable now that this one has been finished.
+      //在完成此任务后，更新可调度的运输订单（因为有的订单可能依赖这个订单）。
       transportOrderUtil.markNewDispatchableOrders();
     }
     else {
