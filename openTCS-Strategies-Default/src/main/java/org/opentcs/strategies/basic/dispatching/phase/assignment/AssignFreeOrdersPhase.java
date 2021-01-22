@@ -305,7 +305,7 @@ public class AssignFreeOrdersPhase
             .map(optCandidate -> optCandidate.get())
             .map(candidate -> new CandidateFilterResult(candidate, assignmentCandidateSelectionFilter.apply(candidate)))
             .collect(Collectors.partitioningBy(filterResult -> !filterResult.isFiltered()));
-
+//将过滤的订单，添加到过滤的订单序列中。
     ordersSplitByFilter.get(Boolean.FALSE).stream()
         .map(CandidateFilterResult::toFilterResult)
         .forEach(filterResult -> assignmentState.addFilteredOrder(filterResult));
@@ -372,14 +372,14 @@ public class AssignFreeOrdersPhase
       transportOrderUtil.abortOrder(candidate.getVehicle(), false, false, false);
     }
   }
-
+//标记签约：将订单和签约该订单的车添加到历史目录中。
   private void doMarkAsAssigned(TransportOrder order, Vehicle vehicle) {
     objectService.appendObjectHistoryEntry(
         order.getReference(),
         new ObjectHistory.Entry(ORDER_ASSIGNED_TO_VEHICLE, vehicle.getName())
     );
   }
-
+  //标记保留：将订单和保留该订单的车辆记录到历史目录中
   private void doMarkAsReserved(TransportOrder order, Vehicle vehicle) {
     objectService.appendObjectHistoryEntry(
         order.getReference(),
@@ -393,7 +393,7 @@ public class AssignFreeOrdersPhase
     return router.getRoute(vehicle, vehiclePosition, order)
         .map(driveOrders -> new AssignmentCandidate(vehicle, order, driveOrders));
   }
-
+//订单的倾向车辆是空，或者订单的倾向车辆和该车辆相同，则订单可以签约到该车
   private boolean orderAssignableToVehicle(TransportOrder order, Vehicle vehicle) {
     return order.getIntendedVehicle() == null
         || Objects.equals(order.getIntendedVehicle(), vehicle.getReference());
