@@ -308,7 +308,6 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
       return;
     }
     super.disable();
-    
    IVehicleMessageService.DisConnect();
     vehicleActuralCyclicTask.terminate();
     vehicleActuralCyclicTask = null;
@@ -322,8 +321,8 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
      eventBus.unsubscribe(this);
     initialized=false;
   }
-  private  final Queue<MovementCommand> movementcomandbufferQueue = new LinkedBlockingQueue<>();
-    private Queue<MovementCommand> getMovementCommandsBufferQueue()
+  private  final LinkedBlockingQueue<MovementCommand> movementcomandbufferQueue = new LinkedBlockingQueue<>();
+    private LinkedBlockingQueue<MovementCommand> getMovementCommandsBufferQueue()
     {
     return  movementcomandbufferQueue;
     }
@@ -331,7 +330,12 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
   @Override
   public synchronized void sendCommand(MovementCommand cmd)
       throws IllegalArgumentException {
-    getMovementCommandsBufferQueue().add(cmd);
+   try {
+     getMovementCommandsBufferQueue().put(cmd);
+   }
+   catch (InterruptedException ex) {
+     Logger.getLogger(PLCComAdapter.class.getName()).log(Level.SEVERE, null, ex);
+   }
     System.out.println(cmd.toString());
   }
   //仅允许单步运行
@@ -678,7 +682,7 @@ public class PLCComAdapter  extends BasicVehicleCommAdapter implements EventHand
       }
      if(pLCCommAdapterConfiguration.stopvehicle_enable()&&filterpoint.verifycanrun(movementCommand,vehicle))
           return;
-  IVehicleMessageService.SendNavigateComand(movementCommand,getProcessModel());
+    IVehicleMessageService.SendNavigateComand(movementCommand,getProcessModel());
       }   
       }
     }  

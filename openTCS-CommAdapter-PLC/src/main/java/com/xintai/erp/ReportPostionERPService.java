@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package com.xintai.erp;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 /**
  *
