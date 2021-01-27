@@ -3,21 +3,25 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.xintai.kecong.message;
+package com.xintai.kecong.message.rqst;
+
+import com.xintai.kecong.message.KeCongComandCode;
+import com.xintai.kecong.message.KeCongRequestMessage;
 
 /**
  *
  * @author Lenovo
  */
-public  class KeCongComandNavigateSearch extends KeCongRequestMessage {
+public class KeCongComandSerachRobotStatue  extends KeCongRequestMessage{
 
-  public KeCongComandNavigateSearch() {
+  public KeCongComandSerachRobotStatue() {
       //expectedresponse=true;
+      super();
   }
 
   @Override
   public void setComandCode() {
-   comandCode=KeCongComandCode.comandRobotNavigationSearch;
+    comandCode=KeCongComandCode.comandRobotStatuSearch;
   }
 
   @Override
@@ -27,7 +31,7 @@ public  class KeCongComandNavigateSearch extends KeCongRequestMessage {
 
   @Override
   public void addData() {
-    dataValue=new byte[0];
+  dataValue=new byte[0];
   }
   
 }

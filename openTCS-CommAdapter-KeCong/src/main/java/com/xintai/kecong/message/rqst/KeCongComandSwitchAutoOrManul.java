@@ -3,7 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.xintai.kecong.message;
+package com.xintai.kecong.message.rqst;
+
+import com.xintai.kecong.message.KeCongComandCode;
+import com.xintai.kecong.message.KeCongRequestMessage;
+
 /**
  *
  * @author Lenovo
@@ -12,6 +16,7 @@ public class KeCongComandSwitchAutoOrManul  extends KeCongRequestMessage {
 private  byte value;
 
   public KeCongComandSwitchAutoOrManul(byte value) {
+    super();
     this.value=value;
    // expectedresponse=false;
   }

@@ -4,8 +4,10 @@
 package com.xintai.vehicle.comadpter;
 
 import com.google.inject.assistedinject.Assisted;
+import com.xintai.kecong.message.rqst.KeCongComandWrite;
 import com.xintai.kecong.message.KeCongCommandResponse;
 import com.xintai.kecong.message.KeCongRequestMessage;
+import static com.xintai.vehicle.comadpter.BoundedCounter.UINT16_MAX_VALUE;
 import java.util.LinkedList;
 import static java.util.Objects.requireNonNull;
 import java.util.Optional;
@@ -36,7 +38,7 @@ public class RequestResponseMatcher {
    * 发送队列
    */
   private final TelegramSender telegramSender;
-
+ private final BoundedCounter globalRequestCounter = new BoundedCounter(0, UINT16_MAX_VALUE);
   /**
    * Creates a new instance.
    * 创建新的实例
@@ -48,16 +50,16 @@ public class RequestResponseMatcher {
     this.telegramSender = requireNonNull(telegramSender, "telegramSender");
   }
 
-  public void enqueueRequest(@Nonnull KeCongRequestMessage request) {
+  public synchronized void enqueueRequest(@Nonnull KeCongRequestMessage request) {
     requireNonNull(request, "request");
     boolean emptyQueueBeforeEnqueue = requests.isEmpty();
-
+     request.SetCqs(globalRequestCounter.getAndIncrement());//此处添加序列号
     LOG.debug("Enqueuing request: {}", request);
     requests.add(request);
-    System.out.println("com.xintai.vehicle.comadpter.RequestResponseMatcher.enqueueRequest()");
+   // System.out.println("com.xintai.vehicle.comadpter.RequestResponseMatcher.enqueueRequest()");
     if (emptyQueueBeforeEnqueue) {
       checkForSendingNextRequest();
-   // requests.remove();//Added by codybin
+      // requests.remove();//Added by codybin
       
     }
   }
@@ -66,11 +68,17 @@ public class RequestResponseMatcher {
    * Checks if a telegram is enqueued and sends it.
    * 检查是否一个报文入列并且发送它
    */
-  public void checkForSendingNextRequest() {
+  private final  static  Object lock=new Object();
+  public synchronized void  checkForSendingNextRequest() {
     LOG.debug("Check for sending next request.");
     if (peekCurrentRequest().isPresent()) {
       telegramSender.sendTelegram(peekCurrentRequest().get());
-      System.out.println("com.xintai.vehicle.comadpter.RequestResponseMatcher.checkForSendingNextRequest()");
+      /*if(peekCurrentRequest().get() instanceof KeCongComandWrite)
+      {
+      requests.remove();
+      }*/
+      
+    //  System.out.println("com.xintai.vehicle.comadpter.RequestResponseMatcher.checkForSendingNextRequest()");
     }
     else {
       LOG.debug("No requests to be sent.");
@@ -93,21 +101,19 @@ public class RequestResponseMatcher {
    * @param response The response to match
    * @return <code>true</code> if the response matches to the first request in the queue.
    */
-  public boolean tryMatchWithCurrentRequest(@Nonnull KeCongCommandResponse response) {
+  public synchronized boolean tryMatchWithCurrentRequest(@Nonnull KeCongCommandResponse response) {
     requireNonNull(response, "response");
     KeCongRequestMessage currentRequest = requests.peek();
     if (currentRequest != null && response.isResponseTo(currentRequest)) {
       requests.remove();
       return true;
     }
-
     if (currentRequest != null) {
       LOG.info("No request matching response with counter {}. Latest request counter is {}.",
                response.getcqs(), currentRequest.getcqs());
     }
     else {
-      LOG.info("Received response with counter {}, but no request is waiting for a response.",
-               response.getcqs());
+     LOG.info("Received response with counter {}, but no request is waiting for a response.",       response.getcqs());
     }
 
     return false;

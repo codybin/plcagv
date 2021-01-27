@@ -97,6 +97,7 @@ return bytes2Double(tempbyte);
         }
         return value;
     }
+  //这个地方转换的是四个字节的，但是穿了8个字节，可能先不用改变。
 public static int byteArrayToInt(byte[] arrr,int offset)
 {
 byte [] tempbyte=new byte[8];

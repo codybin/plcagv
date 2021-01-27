@@ -3,9 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.xintai.kecong.message;
+package com.xintai.kecong.message.rqst;
 
 
+import com.xintai.kecong.message.KeCongComandCode;
+import com.xintai.kecong.message.KeCongRequestMessage;
 import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 
@@ -16,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 public class KeCongComandRead  extends KeCongRequestMessage{
    private String name;
   public KeCongComandRead(String name) {
+    super();
     this.name=name;
   }
 

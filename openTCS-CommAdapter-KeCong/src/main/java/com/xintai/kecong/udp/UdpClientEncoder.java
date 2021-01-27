@@ -9,8 +9,8 @@ package com.xintai.kecong.udp;
  *
  * @author Lenovo
  */
-import com.xintai.kecong.message.KeCongComandRead;
-import com.xintai.kecong.message.KeCongComandWrite;
+import com.xintai.kecong.message.rqst.KeCongComandRead;
+import com.xintai.kecong.message.rqst.KeCongComandWrite;
 import com.xintai.kecong.message.KeCongRequestMessage;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -49,12 +49,12 @@ public class UdpClientEncoder extends MessageToMessageEncoder<KeCongRequestMessa
        ByteBuf byteBuf = Unpooled.copiedBuffer(msg.creatMessage());
        InetSocketAddress remoteAddress1=new InetSocketAddress("192.168.100.200",17800);
         out.add(new DatagramPacket(byteBuf, remoteAddress1 )); 
-          System.out.println("[Client] encode to " + remoteAddress1.toString());
+         // System.out.println("[Client] encode to " + remoteAddress1.toString());
       
       }else
       {
       ByteBuf byteBuf = Unpooled.copiedBuffer(msg.creatMessage());
-        System.out.println("[Client] encode to " + remoteAddress.toString());
+      //  System.out.println("[Client] encode to " + remoteAddress.toString());
         out.add(new DatagramPacket(byteBuf, remoteAddress)); 
       }
      

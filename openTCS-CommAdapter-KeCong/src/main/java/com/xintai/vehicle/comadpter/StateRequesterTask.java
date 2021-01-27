@@ -43,7 +43,7 @@ public class StateRequesterTask {
   /**
    * The interval requests should be enqueued.
    */
-  private int requestInterval = 1500;
+  private int requestInterval = 500;
 
   /**
    * Creates a new instance.

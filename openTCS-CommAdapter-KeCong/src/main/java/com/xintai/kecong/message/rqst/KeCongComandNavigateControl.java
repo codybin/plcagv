@@ -3,12 +3,22 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.xintai.kecong.message;
+package com.xintai.kecong.message.rqst;
+
+import com.xintai.kecong.message.ByteQueue;
+import com.xintai.kecong.message.DataConvertUtl;
+import com.xintai.kecong.message.KeCongComandCode;
+import com.xintai.kecong.message.KeCongRequestMessage;
+
 /**
  *
  * @author Lenovo
  */
 public class KeCongComandNavigateControl extends KeCongRequestMessage {
+
+  public KeCongComandNavigateControl() {
+    super();
+  }
 
 
   public byte getOperation() {

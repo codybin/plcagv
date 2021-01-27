@@ -13,6 +13,49 @@ import java.io.Serializable;
  */
 public class RobotStatuResponseModel implements  Serializable{
 
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (getClass() != obj.getClass()) {
+      return false;
+    }
+    final RobotStatuResponseModel other = (RobotStatuResponseModel) obj;
+    if (Double.doubleToLongBits(this.positionx) != Double.doubleToLongBits(other.positionx)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.postiony) != Double.doubleToLongBits(other.postiony)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.postiontheta) != Double.doubleToLongBits(other.postiontheta)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.batterypower) != Double.doubleToLongBits(other.batterypower)) {
+      return false;
+    }
+    if (this.runmode != other.runmode) {
+      return false;
+    }
+     if (this.currenttaskstatue != other.currenttaskstatue) {
+      return false;
+    }
+    if (this.currenttargetid != other.currenttargetid) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.batteryvoltage) != Double.doubleToLongBits(other.batteryvoltage)) {
+      return false;
+    }
+    if (Double.doubleToLongBits(this.current) != Double.doubleToLongBits(other.current)) {
+      return false;
+    }
+    return true;
+  }
+
   /**
    * @param bodytemprature the bodytemprature to set
    */

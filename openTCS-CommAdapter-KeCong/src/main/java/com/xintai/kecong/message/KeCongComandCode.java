@@ -13,7 +13,7 @@ package com.xintai.kecong.message;
 
 /** @pdOid 60bbdbd0-32fa-4620-bf19-507348e2da75 */
 public class KeCongComandCode {
-  
+
    public  static final int comandCodereadVar = 0x01;
 
    public  static final int comandCodeSwitchManulOrAuto = 0x11;
