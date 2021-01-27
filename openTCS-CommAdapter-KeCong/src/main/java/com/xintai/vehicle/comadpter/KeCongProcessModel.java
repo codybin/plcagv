@@ -6,6 +6,7 @@
 package com.xintai.vehicle.comadpter;
 
 
+import com.xintai.kecong.message.KeCongRobotStatuSearchResponse;
 import com.xintai.kecong.model.NavigateStatuResponseModel;
 import com.xintai.kecong.model.ReadVarModel;
 import com.xintai.kecong.model.RobotStatuResponseModel;
@@ -22,6 +23,37 @@ import static org.opentcs.util.Assertions.checkInRange;
  */
 public class KeCongProcessModel   extends VehicleProcessModel {
 
+ private volatile RobotStatuResponseModel currentrobotstatuResponse;
+
+  public RobotStatuResponseModel getCurrentrobotstatuResponse() {
+    return currentrobotstatuResponse;
+  }
+
+  public void setCurrentrobotstatuResponse(RobotStatuResponseModel currentrobotstatuResponse) {
+    this.currentrobotstatuResponse = currentrobotstatuResponse;
+  }
+  
+  private boolean singleStepModeEnabled;
+
+  
+     public synchronized void setSingleStepModeEnabled(final boolean mode) {
+    boolean oldValue = singleStepModeEnabled;
+    singleStepModeEnabled = mode;
+
+    getPropertyChangeSupport().firePropertyChange(Attribute.SINGLE_STEP_MODE.name(),
+                                                  oldValue,
+                                                  mode);
+  }
+
+  /**
+   * Returns this communication adapter's <em>single step mode</em> flag.
+   *
+   * @return <code>true</code> if, and only if, this adapter is currently in
+   * single step mode.
+   */
+  public synchronized boolean isSingleStepModeEnabled() {
+    return singleStepModeEnabled;
+  }
   /**
    * @return the ischarging
    */
@@ -40,9 +72,19 @@ public class KeCongProcessModel   extends VehicleProcessModel {
   private  boolean autorun;
   private String vehicleHost;
  private  RobotStatuResponseModel keCongRobotStatuSearchResponse;
+  private  RobotStatuResponseModel keCongRobotPreStatuSearchResponse;
+
+  public RobotStatuResponseModel getKeCongRobotPreStatuSearchResponse() {
+    return keCongRobotPreStatuSearchResponse;
+  }
+
+  public void setKeCongRobotPreStatuSearchResponse(
+                                                   RobotStatuResponseModel keCongRobotPreStatuSearchResponse) {
+    this.keCongRobotPreStatuSearchResponse = keCongRobotPreStatuSearchResponse;
+  }
   private boolean periodicenable;
   private NavigateStatuResponseModel navigateStatuResponseModel;
- private    NavigateStatuResponseModel currentStateModel;
+ private  NavigateStatuResponseModel currentStateModel;
  private  NavigateStatuResponseModel previesStatuResponseModel;
   private ReadVarModel readVarModel;
   private final String loadOperation;
@@ -155,9 +197,8 @@ private volatile  boolean  ischarging;
     public synchronized void setRobotStatu(RobotStatuResponseModel keCongRobotStatuSearchResponse) {
     RobotStatuResponseModel oldValue = this.keCongRobotStatuSearchResponse;
     this.keCongRobotStatuSearchResponse = keCongRobotStatuSearchResponse;
- 
-      setVehicleOrientationAngle(180- Math.abs (57.35* keCongRobotStatuSearchResponse.getPostiontheta()));
-      setVehiclePrecisePosition(new Triple((long)(1000*keCongRobotStatuSearchResponse.getPositionx()),(long)(1000*keCongRobotStatuSearchResponse.getPostiony()),0));
+     setVehicleOrientationAngle(180- Math.abs (57.35* keCongRobotStatuSearchResponse.getPostiontheta()));
+     setVehiclePrecisePosition(new Triple((long)(1000*keCongRobotStatuSearchResponse.getPositionx()),(long)(1000*keCongRobotStatuSearchResponse.getPostiony()),0));
     getPropertyChangeSupport().firePropertyChange(KeCongProcessModel.Attribute.RobotStatu.name(),
                                                   oldValue,
                                                   keCongRobotStatuSearchResponse);}
@@ -217,7 +258,8 @@ private volatile  boolean  ischarging;
     Periodic,
     IsConnected,
     NavigateStatu,
-    ReadVarModel;
+    ReadVarModel,
+    SINGLE_STEP_MODE;
   }
 
   /**
