@@ -239,7 +239,8 @@ public class TransportOrderUtil
    * Checks if the given drive order must be processed or could/should be left out.
    * Orders that should be left out are those with destinations at which the
    * vehicle is already present and which require no destination operation.
-   *
+   *检查是否被给定的订单必须被处理或者应该被排除。
+   * 应该被排除的订单是那些车辆已经在目的地和不需要运行的订单。
    * @param driveOrder The drive order to be processed.
    * @param vehicle The vehicle that would process the order.
    * @return <code>true</code> if, and only if, the given drive order must be

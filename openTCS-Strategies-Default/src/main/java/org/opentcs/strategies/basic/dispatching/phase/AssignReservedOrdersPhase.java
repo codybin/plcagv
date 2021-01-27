@@ -24,7 +24,7 @@ import org.opentcs.strategies.basic.dispatching.selection.candidates.CompositeAs
 /**
  * Assigns reserved transport orders (if any) to vehicles that have just finished their withdrawn
  * ones.
- *
+ *签约保留订单到刚刚取消订单的车辆
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class AssignReservedOrdersPhase
@@ -99,6 +99,7 @@ public class AssignReservedOrdersPhase
   private void checkForReservedOrder(Vehicle vehicle) {
     // Check if there's an order reserved for this vehicle that is in an assignable state. If yes,
     // try to assign that.
+    //检查是否有一个可签约状态的订单保留在这个车上。如果有试着签约它。
     // Note that we expect no more than a single reserved order, and remove ALL reservations if we
     // find at least one, even if it cannot be processed by the vehicle in the end.
     orderReservationPool.findReservations(vehicle.getReference()).stream()

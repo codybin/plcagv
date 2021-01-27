@@ -23,7 +23,7 @@ import org.opentcs.strategies.basic.dispatching.AssignmentCandidate;
  * @author Martin Grzenia (Fraunhofer IML)
  */
 public class AssignmentState {
-
+ 
   private final List<AssignmentCandidate> assignedCandidates = new ArrayList<>();
   private final List<AssignmentCandidate> reservedCandidates = new ArrayList<>();
   private final Map<TransportOrder, OrderFilterResult> filteredOrders = new HashMap<>();
@@ -31,7 +31,7 @@ public class AssignmentState {
   public AssignmentState() {
   }
 
-  public List<AssignmentCandidate> getAssignedCandidates() {
+  public List<AssignmentCandidate>getAssignedCandidates() {
     return assignedCandidates;
   }
 
