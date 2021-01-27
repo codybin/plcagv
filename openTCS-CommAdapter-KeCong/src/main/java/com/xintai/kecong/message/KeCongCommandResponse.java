@@ -19,7 +19,7 @@ protected int length;
     this.bytequeque=bytequeque;
     if(bytequeque.peekAll().length>=28){
     this.bytequeque.pop(buffer,0,28);
-  parse();
+     parse();
     }
   }
  public boolean isResponseTo(KeCongRequestMessage keCongRequestMessage)
@@ -33,7 +33,7 @@ protected int length;
  }
  private void parse()
  {cqs=buffer[18]&0xff|(buffer[19]&0xff)<<8;
- System.out.println(String.valueOf(cqs));
+ //System.out.println(String.valueOf(cqs));
  comandCode=buffer[21];
  returnCode=buffer[22];
 length=buffer[24]&0xff|(buffer[25]&0xff)<<8;
