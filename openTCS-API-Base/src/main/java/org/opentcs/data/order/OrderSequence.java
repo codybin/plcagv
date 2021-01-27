@@ -24,11 +24,14 @@ import static org.opentcs.util.Assertions.checkInRange;
 /**
  * Describes a process spanning multiple {@link TransportOrder}s which are to be executed
  * subsequently by the same {@link Vehicle}.
+ * 描述一个过程。多个订单期望被相同的车辆运行。
  * <p>
  * The most important rules for order sequence processing are:
+ * 对订单序列最重要的规则是：
  * </p>
  * <ul>
  * <li>Only transport orders that have not yet been activated may be added to an order sequence.
+ * 只有没有被激活的订单可以被添加到一个订单序列里面
  * Allowing them to be added at a later point of time would imply that, due to concurrency in the
  * kernel, a transport order might happen to be dispatched at the same time or shortly after it is
  * added to a sequence, regardless of if its predecessors in the sequence have already been finished
@@ -68,11 +71,13 @@ public class OrderSequence
    */
   private final int finishedIndex;
   /**
+   * 暗示是否这个订单序列完成，并且不被更多订单扩展
    * Indicates whether this order sequence is complete and will not be extended by more orders.
    */
   private final boolean complete;
   /**
    * Indicates whether this order sequence has been processed completely.
+   * 是否这个订单已经被处理完成
    */
   private final boolean finished;
   /**
@@ -237,7 +242,6 @@ public class OrderSequence
   public OrderSequence withOrder(TCSObjectReference<TransportOrder> order) {
     checkArgument(!complete, "Sequence complete, cannot add order");
     checkArgument(!orders.contains(order), "Sequence already contains order %s", order);
-
     return new OrderSequence(getName(),
                              getProperties(),
                              getHistory(),
