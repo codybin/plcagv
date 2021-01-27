@@ -11,7 +11,14 @@ package com.xintai.kecong.message;
 public abstract class KeCongRequestMessage extends KeCongMessage {
 
   protected  ByteQueue bytequeue=new ByteQueue();
-   
+
+  public KeCongRequestMessage() {
+    
+  }   
+  public void SetCqs(int cqs)
+  {
+  this.cqs=cqs;
+  }
 protected int tempconsquence=0;
 /*   protected boolean expectedresponse=false;
 protected boolean ExpectedResponse()
@@ -25,13 +32,11 @@ return expectedresponse;
    private int cqs=0;
 private void creatmessageheader()
 {
-  ++communictaionSq;
-  cqs=communictaionSq;
 setComandCode();
 setDataLength();
 addData();
 }
-public int getcqs()
+    public int getcqs()
     {
      return cqs&0xffff;
     }
@@ -51,7 +56,7 @@ public int getcqs()
        this.bytequeue.push(protocolcode);
        creatmessageheader();
       this.bytequeue.push(diagramType);
-      this.bytequeue.pushmU2B(communictaionSq);
+      this.bytequeue.pushmU2B(cqs);
       this.bytequeue.push(seviceCode);
       this.bytequeue.push(comandCode);
       this.bytequeue.push(returnCode);
