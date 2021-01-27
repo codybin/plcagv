@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * A container for <code>TCSObject</code>s belonging together.
  * It keeps all basic data objects (model data, transport order data and system
  * messages) and ensures these objects have unique IDs and names.
- *
+ *一个容器，聚集所有对象（模型，运输订单，和系统信息）。它保持它们id和名字都唯一
  * @author Stefan Walter (Fraunhofer IML)
  */
 public class TCSObjectPool {

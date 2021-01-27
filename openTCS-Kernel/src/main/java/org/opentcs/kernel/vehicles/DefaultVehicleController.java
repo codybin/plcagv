@@ -308,7 +308,7 @@ if(commAdapter instanceof  KeCongCommAdapter)
     {
       if (currVehicleState.getTransportOrder() != null && prevVehicleState.getTransportOrder() == null) {
      TCSObjectReference<TransportOrder> tCSObjectReference= currVehicleState.getTransportOrder();
-   TransportOrder transportOrder= objectPool.getObject(TransportOrder.class, tCSObjectReference);
+    TransportOrder transportOrder= objectPool.getObject(TransportOrder.class, tCSObjectReference);
      String direction= transportOrder.getProperty("direction");
      String ordername=transportOrder.getProperty("ordername");
      String ordetype=transportOrder.getProperty("ordertype");

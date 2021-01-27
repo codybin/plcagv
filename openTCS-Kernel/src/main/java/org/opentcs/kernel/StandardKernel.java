@@ -157,9 +157,9 @@ final class StandardKernel
     Uninterruptibles.sleepUninterruptibly(1, TimeUnit.SECONDS);
     // Shut down all kernel extensions.
     LOG.debug("Shutting down kernel extensions...");
-    for (KernelExtension extension : kernelExtensions) {
+    kernelExtensions.forEach((extension) -> {
       extension.terminate();
-    }
+    });
     kernelExecutor.shutdown();
     LOG.info("Kernel thread finished.");
   }

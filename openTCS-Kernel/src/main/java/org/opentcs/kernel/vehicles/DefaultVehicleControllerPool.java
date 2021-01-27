@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Maintains associations of {@link Vehicle}, {@link VehicleController} and
  * {@link VehicleCommAdapter}.
- *
+ *维护车辆控制器、车辆、车辆适配器的联系
  * @author Stefan Walter (Fraunhofer IML)
  */
 public final class DefaultVehicleControllerPool

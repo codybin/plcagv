@@ -80,7 +80,7 @@ public class TransportOrderPool {
   /**
    * Returns the <code>TCSObjectPool</code> serving as the container for this
    * order pool's data.
-   *
+   *返回作为服务订单数据容器的对象池
    * @return The <code>TCSObjectPool</code> serving as the container for this
    * order pool's data.
    */
@@ -91,6 +91,7 @@ public class TransportOrderPool {
 
   /**
    * Removes all transport orders from this pool.
+   * 从这个对象池中移除所有订单
    */
   public void clear() {
     LOG.debug("method entry");
@@ -107,6 +108,7 @@ public class TransportOrderPool {
 
   /**
    * Adds a new transport order to the pool.
+   * 增加新的订单到对象池
    * This method implicitly adds the transport order to its wrapping sequence, if any.
    *
    * @param to The transfer object from which to create the new transport order.
@@ -237,6 +239,9 @@ public class TransportOrderPool {
 
   /**
    * Updates a transport order's current drive order.
+   * 更新一个运输订单的当前订单。标记当前订单为完成状态，增加它到过去驱动订单的末尾，
+   * 并且设置当前订单到未来驱动订单的下一个订单。如果当前的订单是空的，则所有的驱动订单
+   * 已经被完成，没有事情被发生。
    * Marks the current drive order as finished, adds it to the list of past
    * drive orders and sets the current drive order to the next one of the list
    * of future drive orders (or <code>null</code>, if that list is empty).
@@ -288,7 +293,7 @@ public class TransportOrderPool {
 
   /**
    * Removes the referenced transport order from this pool.
-   *
+   *从对象池中移除订单
    * @param ref A reference to the transport order to be removed.
    * @return The removed transport order.
    * @throws ObjectUnknownException If the referenced transport order is not
@@ -311,7 +316,7 @@ public class TransportOrderPool {
 
   /**
    * Adds a new order sequence to the pool.
-   *
+   *增加新的订单到对象池中
    * @param to The transfer object from which to create the new order sequence.
    * @return The newly created order sequence.
    * @throws ObjectExistsException If an object with the new object's name already exists.
@@ -334,7 +339,7 @@ public class TransportOrderPool {
 
   /**
    * Sets an order sequence's finished index.
-   *
+   *设置一个订单序列的完成索引号
    * @param seqRef A reference to the order sequence to be modified.
    * @param index The sequence's new finished index.
    * @return The modified order sequence.
@@ -356,7 +361,7 @@ public class TransportOrderPool {
 
   /**
    * Sets an order sequence's complete flag.
-   *
+   *设置一个订单序列的完成标示
    * @param seqRef A reference to the order sequence to be modified.
    * @return The modified order sequence.
    * @throws ObjectUnknownException If the referenced transport order is not
