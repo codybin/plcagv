@@ -18,10 +18,6 @@ public abstract class KeCongMessage  implements Serializable{
    protected final static byte protocolcode = 0x01;
    protected byte diagramType = 0;
    protected static int communictaionSq = 0;
-
-public static int getCommunictaionSq() {
-    return communictaionSq;
-  }
    protected  final static byte seviceCode = 0x10;
    protected byte comandCode = 0;
    protected byte returnCode = 0;
