@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.jingBianDeviceMapper">
+    <!-- 一对多 根据uid查询用户及其关联的订单信息：级联查询的第一种方法（嵌套查询） -->
+    <resultMap type="com.xintai.device.jingBian_Device" id="jingBiandevice">
+        <id property="deviceid" column="deviceid" />
+        <result property="deviceid" column="deviceid" />
+       
+        <collection property="jianbBianLocations" ofType="com.xintai.device.jingBianLocation"
+            column="deviceid" select="com.mybatis.mapper.locationsMapper.selectlocationsById"/>
+    </resultMap>
+    <select id="selectDeviceByID" parameterType="Integer"
+        resultMap="jingBiandevice">
+        select * from jingbiandevice where deviceid = #{deviceid}
+    </select>
+</mapper>

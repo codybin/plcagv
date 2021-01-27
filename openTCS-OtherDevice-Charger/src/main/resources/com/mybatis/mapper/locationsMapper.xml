@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.locationsMapper">
+    <!-- 根据用户uid查询订单信息 -->
+    <select id="selectlocationsById" resultType="com.xintai.device.jingBianLocation"
+        parameterType="Integer">
+        select * from locationid where deviceid=#{id}
+    </select>
+    <update id="clearDeviceLocationIndex" parameterType="jingBianLocation">
+      update locationid set iscapture=#{iscapture} where deviceid = #{deviceid};
+    </update>
+     <update id="setDeviceLocationIndex" parameterType="jingBianLocation">
+      update locationid set iscapture=#{iscapture} where deviceid = #{deviceid} and locationindex=#{locationindex};
+    </update>
+</mapper>

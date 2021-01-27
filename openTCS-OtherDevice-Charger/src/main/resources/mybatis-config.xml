@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <properties resource="jdbc.properties" />
+    <!-- 数据库环境 -->
+    <typeAliases>
+        <typeAlias alias="jingBianLocation" type="com.xintai.device.jingBianLocation"/>
+    </typeAliases>
+    <environments default="development">
+        <environment id="development">
+            <!-- 使用JDBC的事务管理 -->
+            <transactionManager type="JDBC" />
+            <dataSource type="POOLED">
+              		<property name="driver" value="${jdbc.driverClassName}" />
+				<property name="url" value="${jdbc.url}" />
+				<property name="username" value="${jdbc.username}" />
+				<property name="password" value="${jdbc.password}" />     
+            </dataSource>
+        </environment>
+    </environments>
+    <!-- 将mapper文件加入到配置文件中 -->
+    <mappers>
+      <!-- <mapper resource="com/mybatis/mapper/EmployeesMapper.xml" />-->
+        <mapper resource="com/mybatis/mapper/jingBianDeviceMapper.xml" />
+         <mapper resource="com/mybatis/mapper/locationsMapper.xml" />
+    </mappers>
+</configuration>
