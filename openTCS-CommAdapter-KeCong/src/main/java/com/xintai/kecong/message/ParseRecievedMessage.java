@@ -44,7 +44,11 @@ private int consquence=0;
   case KeCongComandCode.comandNavigateControl:
     response=new KeCongComandNavigationResponse(bytequeque);
    break;
+   case KeCongComandCode.comandCodewirteVar:
+     response=new NullComand(bytequeque);
+     break;
     default:
+       System.out.println("com.xintai.kecong.message.ParseRecievedMessage.ParseResponseMessage()"+DataConvertUtl.toHexString(bytequeque.popAll()));
       response=new NullComand(bytequeque);
       break;
   
