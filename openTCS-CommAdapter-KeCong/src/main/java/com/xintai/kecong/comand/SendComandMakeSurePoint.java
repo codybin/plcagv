@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package com.xintai.kecong.comand;
-import com.xintai.kecong.message.KeCongComandMakeSurePosition;
+import com.xintai.kecong.message.rqst.KeCongComandMakeSurePosition;
 import com.xintai.vehicle.comadpter.KeCongCommAdapter;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;

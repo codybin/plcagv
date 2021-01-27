@@ -5,7 +5,7 @@
  */
 package com.xintai.kecong.comand;
 
-import com.xintai.kecong.message.KeCongComandNavigateControl;
+import com.xintai.kecong.message.rqst.KeCongComandNavigateControl;
 import com.xintai.vehicle.comadpter.KeCongCommAdapter;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
@@ -23,7 +23,7 @@ private  final byte usetraficornot;
   {
   
   this.operation=operation;
-    System.err.println(pathid);
+   // System.err.println(pathid);
   this.pathid=pathid;
   this.usetraficornot=usetraficornot;
   }

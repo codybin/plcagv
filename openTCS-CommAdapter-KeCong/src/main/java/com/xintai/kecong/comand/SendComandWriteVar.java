@@ -5,7 +5,7 @@
  */
 package com.xintai.kecong.comand;
 
-import com.xintai.kecong.message.KeCongComandWrite;
+import com.xintai.kecong.message.rqst.KeCongComandWrite;
 import com.xintai.vehicle.comadpter.KeCongCommAdapter;
 import org.opentcs.drivers.vehicle.AdapterCommand;
 import org.opentcs.drivers.vehicle.VehicleCommAdapter;
