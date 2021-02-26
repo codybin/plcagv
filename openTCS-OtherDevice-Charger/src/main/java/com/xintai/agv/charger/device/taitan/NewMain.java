@@ -17,7 +17,9 @@ public class NewMain {
   public static void main(String[] args) {
     // TODO code application logic here
     ChargerDeviceService chargerDeviceService=new ChargerDeviceService("127.0.0.1", 3);
-    System.out.println(chargerDeviceService.getChargerStateModel().toString());
+    ChargerStateModel chargerStateModel= chargerDeviceService.getChargerStateModel();
+    System.out.println(chargerStateModel.toString());
+    System.out.println(chargerStateModel.getChargeStatuesModel().toString());
     System.out.println(chargerDeviceService.WriteChargeSet(1, 6));
   }
   

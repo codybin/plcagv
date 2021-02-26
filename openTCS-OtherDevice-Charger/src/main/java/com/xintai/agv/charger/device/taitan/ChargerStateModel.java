@@ -13,7 +13,7 @@ import com.serotonin.modbus4j.locator.NumericLocator;
  *
  * @author Lenovo
  */
-public class ChargerStateModle {
+public class ChargerStateModel {
 private  float volatage;
 private  float current;
 
@@ -37,10 +37,16 @@ private  float current;
   public int getChargerNumber() {
     return chargerNumber;
   }
-private int chargerState;
-private  int chargerNumber;
-  public ChargerStateModle(byte [] data) {
+  private int chargerState;
+  private  int chargerNumber;
+  private final ChargeStatuesModel chargeStatuesModel;
+
+  public ChargeStatuesModel getChargeStatuesModel() {
+    return chargeStatuesModel;
+  }
+  public ChargerStateModel(byte [] data) {
    decode(data);
+   chargeStatuesModel=new ChargeStatuesModel(chargerState);
   }
   private void decode(byte[] data)
   {
@@ -49,6 +55,9 @@ private  int chargerNumber;
     chargerState=getdata(ChargerDeviceVar.StateAdd, data);
     chargerNumber=getdata(ChargerDeviceVar.IdAdd, data);
   }
+  
+ 
+  
   private int  getdata(int offset,byte [] data)
   {
   NumericLocator numericLocator=   new NumericLocator(3, RegisterRange.HOLDING_REGISTER,offset,DataType.TWO_BYTE_INT_SIGNED);

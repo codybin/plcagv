@@ -47,13 +47,13 @@ result=   modbus4jWriter.writeRegisters(slaveid, ChargerDeviceVar.EnableAdd, cha
     } 
   return result;
   }
-   public ChargerStateModle getChargerStateModel()
+   public ChargerStateModel getChargerStateModel()
    {
-       ChargerStateModle chargerStateModle=null;
+       ChargerStateModel chargerStateModle=null;
      Modbus4jReader modbus4jReader=new Modbus4jReader(modbusMaster);
       try {
      byte[] data = modbus4jReader.readHoldingRegister(slaveid, 0, 4);
-     chargerStateModle=new ChargerStateModle(data);
+     chargerStateModle=new ChargerStateModel(data);
       }
       catch (ModbusTransportException ex) {
         Logger.getLogger(ChargerDeviceService.class.getName()).log(Level.SEVERE, null, ex);
