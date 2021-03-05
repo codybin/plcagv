@@ -40,8 +40,6 @@ return byteQueue._popU2B();
    }
    private float getfloatdate()
    {
-       NumericLocator num=new NumericLocator(5, RegisterRange.HOLDING_REGISTER,1,DataType.FOUR_BYTE_FLOAT_SWAPPED);
-      float f=0f;
      byte[]data=new byte[4];
      byteQueue.pop(data);
      return Float.intBitsToFloat(((data[2] & 0xff) << 24) | ((data[3] & 0xff) << 16)

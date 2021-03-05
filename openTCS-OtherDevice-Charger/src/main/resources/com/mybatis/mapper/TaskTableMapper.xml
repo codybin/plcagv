@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.TaskTableMapper">
+    <select id="getTaskTable" parameterType="String" resultType="com.xintai.WMSTaskTable">
+      select * from tasktable where tasknumber=#{tasknumber}       
+    </select>
+     <insert id="addTaskTable" parameterType="com.xintai.WMSTaskTable">
+        insert into tasktable (tasknumber,tasktype,startstation,endstation,AGVstate)
+        values(#{tasknumber},#{tasktype},#{startstation},#{endstation},#{AGVstate})
+    </insert>
+     <update id="updateTaskTable" parameterType="com.xintai.WMSTaskTable">
+        update tasktable set AGVstate=#{AGVstate} where tasknumber = #{tasknumber}
+    </update>
+      <delete id="deleteTaskTable" parameterType="String">
+        delete from tasktable where tasknumber= #{id}
+    </delete>
+</mapper>

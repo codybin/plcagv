@@ -28,7 +28,9 @@ dependencies {
 compile group: 'javax.persistence', name: 'javax.persistence-api', version: '2.2'
 compile group: 'org.mybatis', name: 'mybatis', version: '3.4.6'
 // https://mvnrepository.com/artifact/mysql/mysql-connector-java
-compile group: 'mysql', name: 'mysql-connector-java', version: '5.1.47'
+compile group: 'mysql', name: 'mysql-connector-java', version: '8.0.23'
+// https://mvnrepository.com/artifact/org.codehaus.jackson/jackson-mapper-asl
+implementation group: 'org.codehaus.jackson', name: 'jackson-mapper-asl', version: '1.9.13'
 
     // https://mvnrepository.com/artifact/org.squirrelframework/squirrel-foundation
 compile group: 'org.squirrelframework', name: 'squirrel-foundation', version: '0.3.8'

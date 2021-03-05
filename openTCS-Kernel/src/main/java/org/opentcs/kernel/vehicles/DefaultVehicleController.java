@@ -462,7 +462,6 @@ if(commAdapter instanceof  KeCongCommAdapter)
       // refuse them in allocationSuccessful().
       waitingForAllocation = false;
       pendingResources = null;
-
       vehicleService.updateVehicleRouteProgressIndex(vehicle.getReference(),
                                                      Vehicle.ROUTE_INDEX_DEFAULT);
     }

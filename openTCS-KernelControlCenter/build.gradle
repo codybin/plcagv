@@ -24,7 +24,6 @@ dependencies {
   compile project(':openTCS-CommAdapter-KeCong')
   compile project(':openTCS-CommAdapter-PLC')
   compile project(':openTCS-Impl-Configuration-cfg4j')
-  
   runtime group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.21'
 }
 

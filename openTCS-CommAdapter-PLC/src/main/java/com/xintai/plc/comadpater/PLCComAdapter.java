@@ -139,8 +139,12 @@ public class PLCComAdapter
     eventBus.subscribe(this);
     getProcessModel().setVehicleState(Vehicle.State.IDLE);
     initialized = true;
-  }
+      }
 
+    
+        
+
+ 
   private void processObjectEvent(TCSObjectEvent event) {
     TCSObject<?> object = event.getCurrentOrPreviousObjectState();
     if (object instanceof TransportOrder) {

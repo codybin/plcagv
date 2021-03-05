@@ -4,9 +4,13 @@
 <configuration>
     <properties resource="jdbc.properties" />
     <!-- 数据库环境 -->
+   
     <typeAliases>
         <typeAlias alias="jingBianLocation" type="com.xintai.device.jingBianLocation"/>
     </typeAliases>
+     <typeHandlers>
+               <typeHandler handler="com.xintai.device.JsonTypeHandler" javaType="com.xintai.device.Destinations"/>
+      </typeHandlers>
     <environments default="development">
         <environment id="development">
             <!-- 使用JDBC的事务管理 -->
@@ -21,8 +25,10 @@
     </environments>
     <!-- 将mapper文件加入到配置文件中 -->
     <mappers>
-      <!-- <mapper resource="com/mybatis/mapper/EmployeesMapper.xml" />-->
-        <mapper resource="com/mybatis/mapper/jingBianDeviceMapper.xml" />
-         <mapper resource="com/mybatis/mapper/locationsMapper.xml" />
+      <!-- <mapper  resource="com/mybatis/mapper/EmployeesMapper.xml" />-->
+      <mapper resource="com/mybatis/mapper/TaskTableMapper.xml" />
+       <mapper resource="com/mybatis/mapper/LikuLocationMapper.xml" />
+       <mapper resource="com/mybatis/mapper/jingBianDeviceMapper.xml" />
+       <mapper resource="com/mybatis/mapper/locationsMapper.xml" />
     </mappers>
 </configuration>

@@ -12,6 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.xintai.interaction.erp.ReponseResult;
 import static java.util.Objects.requireNonNull;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -151,6 +152,7 @@ public class ServiceWebApi
                     response.status(404);
                     response.type(HttpConstants.CONTENT_TYPE_APPLICATION_JSON_UTF8);
                     response.body(toJson(exception.getMessage()));
+                   // response.body(toJson(new ReponseResult().ERROR(response.status(),exception.getMessage())));
                   });
     service.exception(ObjectExistsException.class, (exception, request, response) -> {
                     response.status(409);
@@ -187,7 +189,24 @@ public class ServiceWebApi
   public boolean isInitialized() {
     return initialized;
   }
-
+  //test by cody
+  /***
+   * 
+   * @param object
+   * @return
+   * @throws IllegalStateException 
+   */
+private String toJson(Object object)
+      throws IllegalStateException {
+    try {
+      return objectMapper
+          .writerWithDefaultPrettyPrinter()
+          .writeValueAsString(object);
+    }
+    catch (JsonProcessingException exc) {
+      throw new IllegalStateException("Could not produce JSON output", exc);
+    }
+  }
   private String toJson(String exceptionMessage)
       throws IllegalStateException {
     try {

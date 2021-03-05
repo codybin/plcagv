@@ -269,7 +269,7 @@ public class LoopbackCommunicationAdapter
     if (!canProcess) {
       LOG.debug("{}: Cannot process {}, reason: '{}'", getName(), operations, reason);
     }
-    return new ExplainedBoolean(canProcess, reason);
+    return new ExplainedBoolean(true, reason);
   }
 
   @Override

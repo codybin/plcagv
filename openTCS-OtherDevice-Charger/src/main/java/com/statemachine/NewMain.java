@@ -17,37 +17,59 @@ import org.squirrelframework.foundation.fsm.impl.AbstractUntypedStateMachine;
  */
 public class NewMain {
 
-  /**
-   * @param args the command line arguments
-   */
-   // 1. Define State Machine Event
-    enum FSMEvent {
-        ToA, ToB, ToC, ToD
-    }
-
-    // 2. Define State Machine Class
-    @StateMachineParameters(stateType=String.class, eventType=FSMEvent.class, contextType=Integer.class)
-    static class StateMachineSample extends AbstractUntypedStateMachine {
-        protected void fromAToB(String from, String to, FSMEvent event, Integer context) {
-            System.out.println("Transition from '"+from+"' to '"+to+"' on event '"+event+
-                "' with context '"+context+"'.");
-        }
-
-        protected void ontoB(String from, String to, FSMEvent event, Integer context) {
-            System.out.println("Entry State \'"+to+"\'.");
-        }
-    }
-
-    public static void main(String[] args) {
-        // 3. Build State Transitions
-        UntypedStateMachineBuilder builder = StateMachineBuilderFactory.create(StateMachineSample.class);
-        builder.externalTransition().from("A").to("B").on(FSMEvent.ToB).callMethod("fromAToB");
-        builder.onEntry("B").callMethod("ontoB");
-
+ 
+  public static void main(String[] args) {
+    // TODO code application logic here
+        UntypedStateMachineBuilder builder = StateMachineBuilderFactory.create(StateMachinePTRK.class);
+        //原料盘头入库
+        //到设备区状态
+  
+        builder.externalTransition().from("IDEL").to("DeviceMiddleZone").on(FSMEventType.toDeviceMiddlePT).callMethod("fromIdelToDeviceMiddle");
+        builder.onEntry("DeviceMiddleZone").callMethod("ontoDeviceMiddle");
+        //到桥状态
+        builder.externalTransition().from("DeviceMiddleZone").to("BrigeZonePTRK").on(FSMEventType.toBrigeZonePTRK).callMethod("fromDeviceMiddletoBrigeZone");
+        builder.onEntry("BrigeZonePTRK").callMethod("ontoBrigeZone");
+        //到等待放料状态
+        builder.externalTransition().from("BrigeZonePTRK").to("WaitForUnLoadPT").on(FSMEventType.toWaitForUnLoadPT).callMethod("fromBrigeZonetoWaitForUnLoad");
+        builder.onEntry("WaitForUnLoadPT").callMethod("ontoWaitForUnLoad");
+        //放料完成状态
+        builder.externalTransition().from("WaitForUnLoadPT").to("UnLoadStatePT").on(FSMEventType.toUnLoadStatePT).callMethod("fromWaitForUnLoadtoUnLoadState");
+        builder.onEntry("UnLoadStatePT").callMethod("ontoUnLoadState");
+        //通知放料完成状态
+        builder.externalTransition().from("UnLoadStatePT").to("FinshedUnLoadState").on(FSMEventType.toFinshedUnLoadPT).callMethod("fromUnLoadStatetoFinshedUnLoad");
+        builder.onEntry("FinshedUnLoadState").callMethod("ontoFinshedUnLoad");
+        //返回到空闲状态
+          builder.externalTransition().from("FinshedUnLoadState").to("IDEL").on(FSMEventType.toIdelState).callMethod("fromUnLoadStatetoFinshedUnLoad");
+        builder.onEntry("IDEL").callMethod("ontoFinshedUnLoad");
+        
+        //到桥为了取料
+         builder.externalTransition().from("IDEL").to("BrigeZonePTCK").on(FSMEventType.toBrigeZonePTCK).callMethod("fromIdelToBrigeZone_CK");
+         builder.onEntry("BrigeZonePTCK").callMethod("ontoBrigeZone_CK");
+         builder.externalTransition().from("BrigeZonePTCK").to("WaitForLoad").on(FSMEventType.toWaitForLoadCK).callMethod("fromBrigeZone_CKToWaitForLoad");
+         builder.onEntry("WaitForLoad").callMethod("ontoWaitForLoad");
+         builder.externalTransition().from("WaitForLoad").to("LoadStatePT").on(FSMEventType.toLoadStateCK).callMethod("fromWaitForLoadtoLoadState");
+        builder.onEntry("LoadStatePT").callMethod("ontoLoadState");
+        builder.externalTransition().from("LoadStatePT").to("FinshedLoadState").on(FSMEventType.toFinshedLoadCK).callMethod("fromLoadStatetoFinshedLoad");
+        builder.onEntry("FinshedLoadState").callMethod("ontoFinshedLoad");
         // 4. Use State Machine
-        UntypedStateMachine fsm = builder.newStateMachine("A");
-        fsm.fire(FSMEvent.ToB, 10);
-        System.out.println("Current state is "+fsm.getCurrentState());
-    }
+        UntypedStateMachine fsm = builder.newStateMachine("IDEL");
+        //入库
+        fsm.fire(FSMEventType.toDeviceMiddlePT, 10);
+        System.out.println(Thread.currentThread().getId());
+         fsm.fire(FSMEventType.toBrigeZonePTRK, 11);
+         fsm.fire(FSMEventType.toWaitForUnLoadPT, 12);
+         fsm.fire(FSMEventType.toUnLoadStatePT, 13);
+         fsm.fire(FSMEventType.toFinshedUnLoadPT, 14);
+         fsm.fire(FSMEventType.toIdelState, 15);
+         //出库
+         fsm.fire(FSMEventType.toBrigeZonePTCK, 10);
+         fsm.fire(FSMEventType.toWaitForLoadCK, 11);
+         fsm.fire(FSMEventType.toLoadStateCK, 12);
+         fsm.fire(FSMEventType.toFinshedLoadCK, 13);
+         fsm.fire(FSMEventType.toFinshedLoadCK, 14);
+         fsm.fire(FSMEventType.toIdelState, 15);
+         System.out.println(fsm.getAllStates());
+      //  System.out.println("Current state is "+fsm.getCurrentState());
+  }
   
 }

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mybatis.mapper.LikuLocationMapper">
+    <resultMap id="pklocation" type="com.xintai.device.DestinationsLocations">
+        <id column="idlikulocation" jdbcType="NUMERIC" property="ID"/>
+        <result column="ordertype" jdbcType="VARCHAR" property="OrderType"/>
+        <result column="wmsstaion" jdbcType="VARCHAR" property="WMSStaion"/>
+        <result column="actionseq" jdbcType="VARCHAR" property="destinations" typeHandler="com.xintai.device.JsonTypeHandler"/>
+    </resultMap>
+    <select id="getLikuLocation" parameterType="String" resultMap="pklocation">
+      select * from likulocation where wmsstaion=#{wmsstaion}      
+    </select>
+</mapper>
