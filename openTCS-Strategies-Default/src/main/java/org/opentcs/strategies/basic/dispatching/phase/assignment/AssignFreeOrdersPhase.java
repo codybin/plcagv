@@ -189,6 +189,8 @@ public class AssignFreeOrdersPhase
 
     // Select only dispatchable orders first, then apply the composite filter, handle
     // the orders that can be tried as usual and mark the others as filtered (if they aren't, yet).
+    //首先只选择可分派的订单，然后应用复合过滤器，handle
+    //可以像往常一样尝试的命令，并将其他的标记为过滤(如果它们还没有过滤)。
     Map<Boolean, List<OrderFilterResult>> ordersSplitByFilter
         = objectService.fetchObjects(TransportOrder.class, isFreelyDispatchableToAnyVehicle)
             .stream()

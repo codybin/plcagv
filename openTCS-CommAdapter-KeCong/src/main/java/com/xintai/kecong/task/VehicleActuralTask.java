@@ -19,42 +19,38 @@ import org.opentcs.util.CyclicTask;
  *
  * @author Lenovo
  */
+public class VehicleActuralTask
+    extends CyclicTask {
 
-  public class VehicleActuralTask
-      extends CyclicTask {
   private final KeCongCommAdapter newKeCongComAdapter;
 
-    public  VehicleActuralTask(KeCongCommAdapter newKeCongComAdapter) {
-      super(100);
-     this.newKeCongComAdapter=newKeCongComAdapter;
+  public VehicleActuralTask(KeCongCommAdapter newKeCongComAdapter) {
+    super(100);
+    this.newKeCongComAdapter = newKeCongComAdapter;
+  }
+
+  @Override
+  protected void runActualTask() {
+    MovementCommand movementCommand;
+    synchronized (VehicleActuralTask.this) {
+      movementCommand = newKeCongComAdapter.getComandMovementRequestQueue().peek();
     }
-    @Override
-    protected void runActualTask()
-    {
-      MovementCommand movementCommand;
-    synchronized(VehicleActuralTask.this)
-    {
-     movementCommand=newKeCongComAdapter.getComandMovementRequestQueue().peek();
+    if (movementCommand != null) {
+      int destinationid = RobotUtl.pointmaptoint(movementCommand);
+      KeCongComandNavigateControl kgcComandNavigateControl = new KeCongComandNavigateControl(String.valueOf(destinationid), (byte) 0, (byte) 0);
+      RobotStatuResponseModel kcrssr = newKeCongComAdapter.getProcessModel().getRobotStatu();
+      if (kcrssr.getCurrenttargetid() != destinationid) {
+        if (kcrssr.getRunmode() != 1) {
+          newKeCongComAdapter.getRequestResponseMatcher().enqueueRequest(new KeCongComandSwitchAutoOrManul((byte) 1));
+        }
+        else {
+          newKeCongComAdapter.getRequestResponseMatcher().enqueueRequest(kgcComandNavigateControl);
+          newKeCongComAdapter.getComandMovementRequestQueue().poll();
+        }
+      }
+      else {
+        //   newKeCongComAdapter.getComandMovementRequestQueue().poll();
+      }
     }
-    if(movementCommand!=null)
-    { 
-      int destinationid = RobotUtl.pointmaptoint(movementCommand); 
-      KeCongComandNavigateControl kgcComandNavigateControl=  new KeCongComandNavigateControl(String.valueOf( destinationid),(byte)0,(byte)0);
-      RobotStatuResponseModel kcrssr=newKeCongComAdapter.getProcessModel().getRobotStatu();    
-   if(kcrssr.getCurrenttargetid()!=destinationid)
-     {
-       if(kcrssr.getRunmode()!=1)
-       {
-         newKeCongComAdapter.getRequestResponseMatcher().enqueueRequest(new KeCongComandSwitchAutoOrManul((byte)1));
-       }else
-       { 
-         newKeCongComAdapter.getRequestResponseMatcher().enqueueRequest(kgcComandNavigateControl);
-         newKeCongComAdapter.getComandMovementRequestQueue().poll();
-       }
-     }else
-      {
-     //   newKeCongComAdapter.getComandMovementRequestQueue().poll();
-       }
-    }  
-    }
+  }
 }

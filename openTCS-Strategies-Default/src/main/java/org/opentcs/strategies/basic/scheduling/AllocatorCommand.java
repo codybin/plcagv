@@ -76,6 +76,7 @@ abstract class AllocatorCommand
 
   /**
    * Indicates resources being released by a client.
+   * 反映客户端正在释放的资源。
    */
   public static class AllocationsReleased
       extends AllocatorCommand {
@@ -108,6 +109,7 @@ abstract class AllocatorCommand
 
   /**
    * Indicates the receiving task should retry to grant deferred allocations.
+   * 指示接收任务应重试授予延迟分配。
    */
   public static class RetryAllocates
       extends AllocatorCommand {
@@ -125,6 +127,7 @@ abstract class AllocatorCommand
   /**
    * Indicates the receiving task should check if a set of resources is prepared for client
    * allocation.
+   * *表示接收任务应该检查是否为客户端准备了一组资源
    */
   public static class CheckAllocationsPrepared
       extends AllocatorCommand {
@@ -157,6 +160,7 @@ abstract class AllocatorCommand
 
   /**
    * Indicates the receiving task should try to allocate a set of resources for a client.
+   * 指示接收任务应该尝试为客户机分配一组资源。
    */
   public static class Allocate
       extends AllocatorCommand {

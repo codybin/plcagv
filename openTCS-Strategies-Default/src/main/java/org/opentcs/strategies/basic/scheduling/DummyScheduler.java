@@ -22,6 +22,10 @@ import org.opentcs.data.model.TCSResource;
  * allocations are granted immediately without checking.
  *
  * @author Stefan Walter (Fraunhofer IML)
+ * *一个<code>调度程序</code>实现，不真正做任何资源管理-所有
+ *拨款不经核实立即发放。
+ *
+ * @作者斯特凡·沃尔特(弗劳恩霍夫IML)
  */
 public class DummyScheduler
     implements Scheduler {
@@ -75,8 +79,10 @@ public class DummyScheduler
     requireNonNull(resourceUser, "resourceUser");
     requireNonNull(resources, "resources");
     // Just schedule the callback for successful allocation.
+    //为成功分配调度回调函数。
     callbackExecutor.execute(new CallbackTask(resourceUser, resources));
     // Don't do anything else - this is a dummy, after all.
+    //不要做其他任何事情-毕竟这是一个虚拟的。
   }
 
   @Override

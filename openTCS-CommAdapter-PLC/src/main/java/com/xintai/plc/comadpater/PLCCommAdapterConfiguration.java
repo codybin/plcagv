@@ -69,5 +69,6 @@ public interface PLCCommAdapterConfiguration {
       description = "Whether to stop vehicle before five or more points.",
       orderKey = "8")
   boolean stopvehicle_enable();
+ 
 }
 

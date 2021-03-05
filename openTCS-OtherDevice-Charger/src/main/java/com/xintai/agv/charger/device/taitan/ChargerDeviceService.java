@@ -20,53 +20,55 @@ import java.util.logging.Logger;
  * @author Lenovo
  */
 public class ChargerDeviceService {
-private final int slaveid;
-  public ChargerDeviceService(String ip,int slaveid) {
+
+  private final int slaveid;
+
+  public ChargerDeviceService(String ip, int slaveid) {
     this.modbusMaster = getModbusMaster(ip);
-    this.slaveid=slaveid;
+    this.slaveid = slaveid;
   }
   ModbusMaster modbusMaster;
-  private ModbusMaster getModbusMaster(String IP)
-  {
-   modbusMaster=  ModbusTcpMaster.getMasterRTUOverTcp(IP);
-  return  modbusMaster;
+
+  private ModbusMaster getModbusMaster(String IP) {
+    modbusMaster = ModbusTcpMaster.getMasterRTUOverTcp(IP);
+    return modbusMaster;
   }
-  public boolean WriteChargeSet(int enablecharge,int chargernumber)
-  {
-    boolean result=false;
-   Modbus4jWriter modbus4jWriter=new Modbus4jWriter(modbusMaster);
-   ChargerSetModel chargerSetModel=new ChargerSetModel(enablecharge, chargernumber);
+
+  public boolean WriteChargeSet(int enablecharge, int chargernumber) {
+    boolean result = false;
+    Modbus4jWriter modbus4jWriter = new Modbus4jWriter(modbusMaster);
+    ChargerSetModel chargerSetModel = new ChargerSetModel(enablecharge, chargernumber);
     try {
-result=   modbus4jWriter.writeRegisters(slaveid, ChargerDeviceVar.EnableAdd, chargerSetModel.getdata());
+      result = modbus4jWriter.writeRegisters(slaveid, ChargerDeviceVar.EnableAdd, chargerSetModel.getdata());
     }
     catch (ModbusTransportException ex) {
       Logger.getLogger(NewMain.class.getName()).log(Level.SEVERE, null, ex);
     }
     catch (ModbusInitException ex) {
       Logger.getLogger(NewMain.class.getName()).log(Level.SEVERE, null, ex);
-    } 
-  return result;
+    }
+    return result;
   }
-   public ChargerStateModel getChargerStateModel()
-   {
-       ChargerStateModel chargerStateModle=null;
-     Modbus4jReader modbus4jReader=new Modbus4jReader(modbusMaster);
-      try {
-     byte[] data = modbus4jReader.readHoldingRegister(slaveid, 0, 4);
-     chargerStateModle=new ChargerStateModel(data);
-      }
-      catch (ModbusTransportException ex) {
-        Logger.getLogger(ChargerDeviceService.class.getName()).log(Level.SEVERE, null, ex);
-      }
-      catch (ErrorResponseException ex) {
-        Logger.getLogger(ChargerDeviceService.class.getName()).log(Level.SEVERE, null, ex);
-      }
-      catch (ModbusInitException ex) {
-        Logger.getLogger(ChargerDeviceService.class.getName()).log(Level.SEVERE, null, ex);
-      }
-   
-   return chargerStateModle;
-   
-   }
-    
+
+  public ChargerStateModel getChargerStateModel() {
+    ChargerStateModel chargerStateModle = null;
+    Modbus4jReader modbus4jReader = new Modbus4jReader(modbusMaster);
+    try {
+      byte[] data = modbus4jReader.readHoldingRegister(slaveid, 0, 4);
+      chargerStateModle = new ChargerStateModel(data);
+    }
+    catch (ModbusTransportException ex) {
+      Logger.getLogger(ChargerDeviceService.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    catch (ErrorResponseException ex) {
+      Logger.getLogger(ChargerDeviceService.class.getName()).log(Level.SEVERE, null, ex);
+    }
+    catch (ModbusInitException ex) {
+      Logger.getLogger(ChargerDeviceService.class.getName()).log(Level.SEVERE, null, ex);
+    }
+
+    return chargerStateModle;
+
+  }
+
 }

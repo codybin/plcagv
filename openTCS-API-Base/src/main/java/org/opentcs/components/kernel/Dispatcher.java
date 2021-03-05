@@ -61,6 +61,7 @@ public interface Dispatcher
   String PROPKEY_ASSIGNED_RECHARGE_LOCATION = "tcs:assignedRechargeLocation";
   /**
    * The key of a vehicle property defining the name of the vehicle's preferred recharge location.
+   * 车辆属性的键，定义车辆首选充值位置的名称。
    * <p>
    * Whether and in what way this is respected for selecting a recharge location is
    * implementation-specific.

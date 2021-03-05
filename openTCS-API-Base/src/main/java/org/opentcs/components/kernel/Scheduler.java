@@ -73,6 +73,14 @@ public interface Scheduler
    * @throws IllegalArgumentException If the given client did not claim any resources, or if the
    * resources to be allocated are not in the set of currently claimed resources, or if the client
    * has already requested resources that have not yet been granted.
+   * *请求分配给定的资源。
+   *客户端将通过回调通知分配成功与否。
+   *
+   *请求资源的客户端。
+   *请求的资源。
+   * @throws IllegalArgumentException，如果给定的客户端没有声明任何资源，或者
+   *要分配的资源不在当前声称的资源集中，或者如果客户端
+   *已经请求了尚未被授予的资源。
    */
   void allocate(@Nonnull Client client, @Nonnull Set<TCSResource<?>> resources)
       throws IllegalArgumentException;

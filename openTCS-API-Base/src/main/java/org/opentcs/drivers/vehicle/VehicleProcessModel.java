@@ -427,6 +427,7 @@ public class VehicleProcessModel {
 
   /**
    * Notifies observers that the given command has been executed by the comm adapter/vehicle.
+   * *通知观察者给定的命令已经被comm适配器/车辆执行。
    *
    * @param executedCommand The command that has been executed.
    */

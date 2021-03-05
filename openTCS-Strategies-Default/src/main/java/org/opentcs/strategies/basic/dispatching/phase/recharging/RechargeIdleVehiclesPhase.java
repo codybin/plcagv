@@ -152,6 +152,8 @@ public class RechargeIdleVehiclesPhase
     }
     // Create a transport order for recharging and verify its processability.
     // The recharge order may be withdrawn unless its energy level is critical.
+    //创建一个用于充电的传输订单，并验证其可处理性。
+    //除非能量达到临界水平，否则补给命令可能会被撤销。
     TransportOrder rechargeOrder = orderService.createTransportOrder(
         new TransportOrderCreationTO("Recharge-", chargeDests)
             .withIncompleteName(true)

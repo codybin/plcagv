@@ -95,6 +95,8 @@ public class CheckNewOrdersPhase
                                                  TransportOrder.State.ACTIVE);
     // The transport order has been activated - dispatch it.
     // Check if it has unfinished dependencies.
+    //运输命令已经启动-发送它。
+    //检查是否有未完成的依赖项。
     if (!transportOrderUtil.hasUnfinishedDependencies(order)) {
       transportOrderUtil.updateTransportOrderState(order.getReference(),
                                                    TransportOrder.State.DISPATCHABLE);

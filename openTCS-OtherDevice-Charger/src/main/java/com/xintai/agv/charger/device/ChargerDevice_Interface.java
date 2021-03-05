@@ -19,6 +19,6 @@ public interface ChargerDevice_Interface {
   void ReadTime();
   byte[] GetCurrentChargerTailState();
   byte[] GetCurrentState();
-    boolean InitDevice();
+  boolean InitDevice();
   boolean isInit();
 }

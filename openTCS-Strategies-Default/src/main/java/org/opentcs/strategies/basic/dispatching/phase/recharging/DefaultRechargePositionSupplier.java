@@ -22,6 +22,8 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_ASSIGNED_RECHARGE_LOCATION;
 import static org.opentcs.components.kernel.Dispatcher.PROPKEY_PREFERRED_RECHARGE_LOCATION;
+import static com.xintai.agv.charger.device.taitan.ChargeUtilConfiguration.PROPKEY__RECHARGE_HOST;
+import static com.xintai.agv.charger.device.taitan.ChargeUtilConfiguration.PROPKEY__RECHARGE_SLAVEID;
 import org.opentcs.components.kernel.Router;
 import org.opentcs.components.kernel.services.InternalPlantModelService;
 import org.opentcs.data.model.Location;
@@ -29,6 +31,7 @@ import org.opentcs.data.model.LocationType;
 import org.opentcs.data.model.Point;
 import org.opentcs.data.model.Vehicle;
 import org.opentcs.data.order.DriveOrder;
+
 
 /**
  * Finds assigned, preferred or (routing-wise) cheapest recharge locations for vehicles.
@@ -99,7 +102,7 @@ public class DefaultRechargePositionSupplier
     }
 
     Map<Location, Set<Point>> rechargeLocations
-        = findLocationsForOperation(vehicle.getRechargeOperation(),
+        = findLocationsForOperation1(vehicle.getRechargeOperation(),
                                     vehicle,
                                     router.getTargetedPoints());
 
@@ -176,6 +179,26 @@ public class DefaultRechargePositionSupplier
     for (Location curLoc : plantModelService.fetchObjects(Location.class)) {
       LocationType lType = plantModelService.fetchObject(LocationType.class, curLoc.getType());
       if (lType.isAllowedOperation(operation)) {
+        Set<Point> points = findUnoccupiedAccessPointsForOperation(curLoc,
+                                                                   operation,
+                                                                   vehicle,
+                                                                   targetedPoints);
+        if (!points.isEmpty()) {
+          result.put(curLoc, points);
+        }
+      }
+    }
+
+    return result;
+  }
+  private Map<Location, Set<Point>> findLocationsForOperation1(String operation,
+                                                              Vehicle vehicle,
+                                                              Set<Point> targetedPoints) {
+    Map<Location, Set<Point>> result = new HashMap<>();
+
+    for (Location curLoc : plantModelService.fetchObjects(Location.class)) {
+      LocationType lType = plantModelService.fetchObject(LocationType.class, curLoc.getType());
+      if (lType.isAllowedOperation(operation)&curLoc.getProperty(PROPKEY__RECHARGE_HOST)!=null&curLoc.getProperty(PROPKEY__RECHARGE_SLAVEID)!=null) {
         Set<Point> points = findUnoccupiedAccessPointsForOperation(curLoc,
                                                                    operation,
                                                                    vehicle,

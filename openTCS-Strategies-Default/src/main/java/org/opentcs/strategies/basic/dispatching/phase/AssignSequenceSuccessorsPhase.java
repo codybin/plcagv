@@ -111,11 +111,13 @@ public class AssignSequenceSuccessorsPhase
     OrderSequence seq = objectService.fetchObject(OrderSequence.class, vehicle.getOrderSequence());
 
     // If the order sequence's next order is not available, yet, the vehicle should wait for it.
+    //如果订单序列的下一个订单尚未可用，则车辆应等待它。
     if (seq.getNextUnfinishedOrder() == null) {
       return Optional.empty();
     }
 
     // Return the next order to be processed for the sequence.
+    //返回要为该序列处理的下一个订单。
     return Optional.of(objectService.fetchObject(TransportOrder.class,
                                                  seq.getNextUnfinishedOrder()));
   }

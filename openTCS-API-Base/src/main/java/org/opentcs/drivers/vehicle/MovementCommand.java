@@ -63,6 +63,7 @@ public interface MovementCommand {
 
   /**
    * Checks whether an operation is to be executed in addition to moving or not.
+   * 检查除移动操作外，是否还要执行某个操作
    *
    * @return <code>true</code> if, and only if, no operation is to be executed.
    */
@@ -79,6 +80,7 @@ public interface MovementCommand {
 
   /**
    * Indicates whether this movement is the final one in the driver order it belongs to.
+   * *表示这个移动是否是它所属的驱动顺序中的最后一个移动。
    *
    * @return <code>true</code> if, and only if, this movement is the final one.
    */

@@ -543,6 +543,8 @@ if(commAdapter instanceof  KeCongCommAdapter)
     synchronized (commAdapter) {
       // Check if we've actually been waiting for these resources now. If not,
       // let the scheduler know that we don't want them.
+      //查看我们是否一直在等待这些资源。如果不是这样,
+      //让调度程序知道我们不需要它们。
       if (!Objects.equals(resources, pendingResources)) {
         LOG.warn("{}: Allocated resources ({}) != pending resources ({}), refusing them",
                  vehicle.getName(),
@@ -555,6 +557,9 @@ if(commAdapter instanceof  KeCongCommAdapter)
       // If there was no command in the queue, it must have been withdrawn in
       // the meantime - let the scheduler know that we don't need the resources
       // any more.
+      //如果队列中没有命令，则该命令必须已被撤回
+      //同时——让调度程序知道我们不需要资源
+      //。
       if (command == null) {
         LOG.warn("{}: No pending command, pending resources = {}, refusing allocated resources: {}",
                  vehicle.getName(),
@@ -566,6 +571,10 @@ if(commAdapter instanceof  KeCongCommAdapter)
         // the pending command is reset and therefore the associated allocation will be ignored. 
         // Since there's now a new/updated route we need to trigger the next allocation. Otherwise
         // the vehicle would wait forever to get the next command.
+        //如果控制器的车辆在等待资源分配时被改变了路线
+        //挂起的命令被重置，因此关联的分配将被忽略。
+        //由于现在有一个新的/更新的路由，我们需要触发下一个分配。否则
+        //飞行器将永远等待下一个命令。
         if (canSendNextCommand()) {
           allocateForNextCommand();
         }
@@ -764,6 +773,9 @@ if(commAdapter instanceof  KeCongCommAdapter)
         // Check if there are still commands that have been sent to the communication adapter but
         // not yet executed. If not, the whole order has been executed completely - let the kernel
         // know about that so it can give us the next drive order.
+        //检查是否仍然有命令被发送到通信适配器，但是
+        //尚未执行。如果没有，则整个顺序已被完全执行——让内核执行
+        //你要了解这一点，以便它给我们下一个驱动订单。
         if (commandsSent.isEmpty() && !waitingForAllocation) {
           LOG.debug("{}: Current drive order processed", vehicle.getName());
           currentDriveOrder = null;
@@ -854,6 +866,7 @@ if(commAdapter instanceof  KeCongCommAdapter)
 
   /**
    * Allocate the resources needed for executing the next command.
+   * 分配执行下一个命令所需的资源。
    */
   private void allocateForNextCommand() {
     checkState(pendingCommand == null, "pendingCommand != null");
@@ -866,6 +879,9 @@ if(commAdapter instanceof  KeCongCommAdapter)
     // Remember that we're waiting for an allocation. This ensures that we only
     // wait for one allocation at a time, and that we get the resources from the
     // scheduler in the right order.
+    //请记住，我们正在等待分配。这确保了我们只
+    //每次等待一个分配，然后我们从
+    //调度程序在正确的顺序。
     waitingForAllocation = true;
     pendingCommand = moveCmd;
   }
@@ -875,6 +891,10 @@ if(commAdapter instanceof  KeCongCommAdapter)
    *
    * @param cmd The command for which to return the needed resources.
    * @return A set of resources needed for executing the given command.
+   * 返回执行给定命令所需的一组资源。
+   *
+   * @param cmd返回所需资源的命令。
+   *返回一组执行给定命令所需的资源。
    */
   private Set<TCSResource<?>> getNeededResources(MovementCommand cmd) {
     requireNonNull(cmd, "cmd");

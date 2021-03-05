@@ -1364,27 +1364,35 @@ public class Vehicle
     /**
      * The vehicle's current state is unknown, e.g. because communication with
      * it is currently not possible for some reason.
+     * *车辆的当前状态未知，例如由于与
+     *由于某些原因，目前是不可能的。
      */
     UNKNOWN,
     /**
      * The vehicle's state is known and it's not in an error state, but it is
      * not available for receiving orders.
+     * *车辆的状态是已知的，它不处于错误状态，但它是
+     *不接受订单。
      */
     UNAVAILABLE,
     /**
      * There is a problem with the vehicle.
+     * *这辆车有问题。
      */
     ERROR,
     /**
      * The vehicle is currently idle/available for processing movement orders.
+     * *车辆目前空闲/可用来处理移动指令。
      */
     IDLE,
     /**
      * The vehicle is processing a movement order.
+     * *车辆正在处理移动指令。
      */
     EXECUTING,
     /**
      * The vehicle is currently recharging its battery/refilling fuel.
+     * 车辆目前正在充电/加油。
      */
     CHARGING
   }

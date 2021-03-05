@@ -691,6 +691,8 @@ public class TransportOrder
    *
    * @return The order sequence this order belongs to, or <code>null</code>, if
    * it doesn't belong to any sequence.
+   * *返回该顺序所属的顺序序列，或者<code>null</code>，如果
+   *它不属于任何序列。
    */
   @Nullable
   public TCSObjectReference<OrderSequence> getWrappingSequence() {

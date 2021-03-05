@@ -131,12 +131,14 @@ class AllocatorTask
                resources);
       undoAllocate(client, resources);
       // See if others want the resources this one didn't, then.
+      //如果其他人想要这个不需要的资源。
       scheduleRetryWaitingAllocations();
     }
   }
 
   /**
    * Allocates the given set of resources, if possible.
+   * 分配给定的资源集，如果可能的话
    *
    * @param command Describes the requested allocation.
    * @return <code>true</code> if, and only if, the given resources were allocated.
@@ -177,6 +179,7 @@ class AllocatorTask
 
   /**
    * Unallocates the given set of resources.
+   * 取消分配给定的资源集。
    *
    * @param command Describes the allocated resources.
    */
@@ -188,6 +191,7 @@ class AllocatorTask
 
   /**
    * Moves all waiting allocations back into the incoming queue so they can be rechecked.
+   * 将所有正在等待的分配转移回传入队列，以便重新检查它们。
    */
   private void scheduleRetryWaitingAllocations() {
     for (AllocatorCommand.Allocate allocate : deferredAllocations) {

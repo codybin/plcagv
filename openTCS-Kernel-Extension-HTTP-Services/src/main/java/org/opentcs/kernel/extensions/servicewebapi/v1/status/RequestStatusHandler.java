@@ -165,7 +165,10 @@ public class RequestStatusHandler {
   Vehicle vehicle = vehicles.get(0);
     kernelExecutor.submit(
         () ->{
-       vehicleService.sendCommAdapterMessage(vehicle.getReference(), new SetFinshMarkFromMes(finshInforFromERP.getFinish()));
+          //ÅÐ¶Ï²Ù×÷Ò»ÖÂÐÔ
+//          if(vehicle.getTransportOrder.)
+       vehicleService.sendCommAdapterMessage(vehicle.getReference(), new SetFinshMarkFromMes(finshInforFromERP.getFinish(),finshInforFromERP.getAction()));
+       
         });
   } else {
       throw new ObjectUnknownException("Unknown device comand or no vehicle parking in this site: " + finshInforFromERP.getLocation());

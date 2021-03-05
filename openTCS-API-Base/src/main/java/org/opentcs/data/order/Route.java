@@ -199,6 +199,7 @@ public class Route
 
     /**
      * Returns the point that is reached by travelling the path.
+     * 返回经过路径所到达的点。
      *
      * @return The point that is reached by travelling the path.
      */

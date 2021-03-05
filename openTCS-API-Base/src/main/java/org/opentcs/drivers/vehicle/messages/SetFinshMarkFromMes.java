@@ -21,14 +21,21 @@ public class SetFinshMarkFromMes
    * The speed multiplier in percent.
    */
   private final String multiplier;
+  private final String operation;
 
   /**
    * Creates a new instance.
    *
    * @param multiplier The speed multiplier in percent.
    */
-  public SetFinshMarkFromMes(final String multiplier) {
+  public SetFinshMarkFromMes(final String multiplier,final String operation) {
     this.multiplier =multiplier;
+    this.operation =operation;
+  }
+  
+    public SetFinshMarkFromMes(final String multiplier) {
+    this.multiplier =multiplier;
+    this.operation ="";
   }
 
   /**
@@ -38,5 +45,9 @@ public class SetFinshMarkFromMes
    */
   public String getFinshMark() {
     return multiplier;
+  }
+  
+  public String getOpString(){
+    return operation;
   }
 }

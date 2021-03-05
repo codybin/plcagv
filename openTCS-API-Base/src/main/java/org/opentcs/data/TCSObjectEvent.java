@@ -87,6 +87,10 @@ public class TCSObjectEvent
    *
    * @return The current or the previous state of the object for which this
    * event was created.
+   * *返回为其创建事件的对象的当前状态，
+   * or，如果当前状态为<code>null</code>，表示之前的状态。
+   *返回对象当前或之前的状态
+   *创建事件。
    */
   public TCSObject<?> getCurrentOrPreviousObjectState() {
     if (currentObjectState != null) {
@@ -122,14 +126,17 @@ public class TCSObjectEvent
 
     /**
      * Indicates that the referenced object has been newly created.
+     * *表示引用的对象已被新创建。
      */
     OBJECT_CREATED,
     /**
      * Indicates that the referenced object has been modified.
+     * *表示被引用的对象已经被修改。
      */
     OBJECT_MODIFIED,
     /**
      * Indicates that the referenced object is no longer a valid kernel object.
+     * *表示被引用的对象不再是一个有效的内核对象。
      */
     OBJECT_REMOVED;
   }

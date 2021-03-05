@@ -90,6 +90,8 @@ private DispacherTaskState operationtodispacherTaskState(String opertaion)
 {
   switch(opertaion)
   {
+    case "CHARGE":
+      return  DispacherTaskState.Charging_TASK;
     case "Charge":
       return  DispacherTaskState.Charging_TASK;
     case "Unload":

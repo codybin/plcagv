@@ -128,7 +128,7 @@ public class MovementCommandImpl
   @Nullable
   @Override
   public Location getOpLocation() {
-    return opLocation;
+  return opLocation;
   }
 
   @Override
